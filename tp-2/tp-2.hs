@@ -31,39 +31,10 @@ appDup:: ((a,a) -> b) -> a -> b
 appDup f = g
     where g x = f (x, x)
 
-appFork :: (a -> b, a -> c) -> a -> (b,c)
--- appFork (f, g) x = (f x, g x)
-appFork (f, g) = h
-    where h x = (f x, g x)
-
-
-appPar :: (a -> c, b -> d ) -> (a, b) -> (c, d)
-appPar (f, g) (x, y) = (f x, g y)
 
 appDist :: (a -> b) -> (a, a) -> (b, b)
 appDist f (x, y) = (f x, f y)
 
-
-flip :: (b -> a -> c) -> a -> b -> c
-flip f x y = (f y) x
-
-subst :: (a -> (b -> c)) -> (a -> b) -> a -> c
-subst f g x = (f x) (g x)
-
-
--- I. (a -> b, c -> d) -> ((a, c) -> (b, d)) = appPar
--- II. ((a, a) -> b) -> (a -> b)  = appDup
--- III. (a -> (b -> c)) -> (b -> (a -> c)) = flip
--- IV. (a -> b) -> ((a, a) -> (b, b)) = appDist
--- V. (a -> b, a -> c) -> (a -> (b, c)) = appFork
--- VI. (a -> (b -> c)) -> ((a -> b) -> (a -> c)) = subst
--- VII. a -> (b -> a) = constconst :: a -> (b -> a)
-const x y = x
-
-appDup:: ((a,a) -> b) -> a -> b
--- appDup f x = f(x,x)
-appDup f = g
-    where g x = f (x, x)
 
 appFork :: (a -> b, a -> c) -> a -> (b,c)
 -- appFork (f, g) x = (f x, g x)
@@ -73,9 +44,6 @@ appFork (f, g) = h
 
 appPar :: (a -> c, b -> d ) -> (a, b) -> (c, d)
 appPar (f, g) (x, y) = (f x, g y)
-
-appDist :: (a -> b) -> (a, a) -> (b, b)
-appDist f (x, y) = (f x, f y)
 
 
 flip :: (b -> a -> c) -> a -> b -> c
@@ -111,58 +79,215 @@ i. apply apply :: (a -> b) -> (a -> b)
 -}
 
 
-{-
 
-Ejercicio 5) Dar dos ejemplos de expresiones que tengan cada uno de los siguientes tipos:
-a. Bool: 
+
+-- Ejercicio 5) Dar dos ejemplos de expresiones que tengan cada uno de los siguientes tipos:
+-- a. Bool: 
 esCinco :: Int -> Bool
 esCinco x = x == 5
 
 esPar :: Int -> Bool
 esPar x = x `mod` 2 == 0 
 
-b. (Int, Int)
+-- b. (Int, Int)
 doblePar :: Int -> Int -> (Int, Int)
-doblePar x, y:: (doble x, doble y)
+doblePar x y = (doble x, doble y)
 
 crearPar :: Int -> Int -> (Int, Int)
-crearPar x, y:: (x, y)
+crearPar x y = (x, y)
 
-c. Char -> Int
+-- c. Char -> Int
 unoSiEsLaPrimerLetraDelAbecedario :: Char -> Int
-unoSiEsLaPrimerLetraDelAbecedario "A" = 1
+unoSiEsLaPrimerLetraDelAbecedario 'a' = 1
 unoSiEsLaPrimerLetraDelAbecedario _ = 0
 
 unoSiEsLaUltimaLetraDelAbecedario :: Char -> Int
-unoSiEsLaUltimaLetraDelAbecedario "Z" = 1
+unoSiEsLaUltimaLetraDelAbecedario 'z' = 1
 unoSiEsLaUltimaLetraDelAbecedario _ = 0
 
 
-d. (Int, Char) -> Bool
-hacer
+-- d. (Int, Char) -> Bool
+-- hacer
 
-e. (Int -> Int) -> Int
+-- e. (Int -> Int) -> Int
+aplicarCero :: (Int -> Int) -> Int
+aplicarCero f = f 0
 
-sumarPar :: (Int -> Int) -> Int
-sumarPar (x,y) = x + y
+aplicarNegativo :: (Int -> Int) -> Int
+aplicarNegativo f = f (-5)
 
-restarPar :: (Int -> Int) -> Int
-restarPar (x,y) = x - y
+-- f. (Bool -> Bool, Int)
+-- (/x -> x, 1) :: (Bool -> Bool, Int)
+-- (not, 42) :: (Bool -> Bool, Int)
+
+-- g. a -> Bool
+siempreTrue :: a -> Bool
+siempreTrue _ = True
+
+siempreFalse :: a -> Bool
+siempreFalse _ = False
+
+{-
+
+Ejercicio 6) Para cada una de las siguientes expresiones, decir a cuál función del
+ejercicio 3 es equivalente. Ofrecer argumentos de por qué son equivalentes.
+a. \p -> let (f, g) = p
+	in \x -> (f x, g x)
+appFork porque p es un par de funciones que se aplica a x. 
 
 
-f. (Bool -> Bool, Int)
-(/x -> x, 1) :: (Bool -> Bool, Int)
-(not, 42) :: (Bool -> Bool, Int)
+b. \f -> (\g -> (\x -> f x (g x))
+subst porque recibe dos funciones, una f y otra g y su parametro x. Despues aplica f x que debe devolver una funcion que acepte el resultado de aplicarle g a x.
 
-g. a -> Bool
-esNulo :: a -> Bool 
-esNulo [] = True
-esNulo 0 = True
-esNulo _ = False
 
-esLista :: a -> Bool
-esLista [] = True
-esLista (x:xs) = True
-esLista _ = False
+c. \f -> (\x -> (\y -> (f y) x)
+flip 
+
+d. \f -> (\px -> let (x, y) = px
+	in (f x, f y))
+appDist
+
+e. \x -> (\y -> x)
+const
+
+f. \pf -> let (f, g) = pf
+			in \px -> let (x, y) = p
+						in (f x, g y)
+appPar
+
+g. \f -> (\x -> f (x, x))
+appDup
 
 -}
+
+{-
+
+Ejercicio 7) Encontrar cuales de estas expresiones son equivalentes entre sí.
+Sugerencia: utilizar funciones anónimas es una forma interesante de encontrar
+equivalencias entre expresiones que denotan funciones.
+
+a. appFork (id,id)
+
+
+appFork :: (a -> b, a -> c) -> a -> (b,c)
+appFork (f, g) x = (f x, g x)
+-- en lamdba:
+\(f, g) -> \x -> (f x, g x)
+
+por def de appFork, siendo f = g = id
+-> \(id, id) -> \x -> (id x, id x)
+por red. beta, siendo x = x
+-> (id x, id x) 
+por def de id, siendo x = x
+-> (x, id x) 
+por def de id, siendo x = x
+-> (x, x) 
+
+
+appFork (id, id) :: a -> (a, a)
+
+
+b. \f -> appDup (appDist f)
+
+appDup:: ((a,a) -> b) -> a -> b
+appDup f x = f(x,x)
+-- en lamdba:
+appDub = \f -> \x -> f(x, x)
+
+appDist :: (a -> b) -> (a, a) -> (b, b)
+appDist f (x, y) = (f x, f y)
+-- en lamdba:
+appDist = \f -> \(x, y) -> (f x, f y)
+
+\f -> appDup (appDist f)
+por def de appDup, siendo f = (appDist f)
+\f -> (\(appDist f) -> \x -> (appDist f) (x, x))
+por red. beta, siendo x = x
+\f -> \x -> appDist f (x, x)
+por def de appDist, donde f = f, siendo x = x, y = x
+\f -> \x -> (\f -> \(x, x) -> (f x, f x))
+por red beta
+\f -> \x -> (f x, f x)
+
+
+appDup (appDist f) :: (a -> b) -> a -> (b, b)
+
+c. appDup id
+\id -> \x -> id(x, x)
+por red beta
+\x -> id(x, x)
+
+appDup id :: a -> (a,a)
+
+d. appDup appFork
+
+
+appFork :: (a -> b, a -> c) -> a -> (b,c)
+appFork (f, g) x = (f x, g x)
+-- lamdba:
+appFork = (\(f,g) -> \x -> (f x, g x))
+
+
+appDup appFork
+por def de addDup, siendo f = appFork
+-> appFork (x,x)
+x tiene q ser una funcion, por lo tanto f = g = x
+-> (x x', x x') 
+se le aplica la misma funcion a el mismo parametro, por lo tanto van a devolver lo mismo.
+				recibe una funcion que recibe a que devuelve b. Recibimos a. Devolvemos el resultado de la funcion aplicada
+appDup appFork :: 	(						a 			-> 	b)   -> a 				-> (b, b)
+appDup appFork :: (a -> b) -> a -> (b, b)
+
+Otra expliacion con lamdbas: 
+
+appDup appFork
+por def de addDup, siendo f = appFork
+-> \appFork -> \x -> appFork(x, x)
+por red. bet
+-> \x -> appFork(x, x)
+por def de appFork, siendo f = g = x
+-> \x -> (\(x,x) -> \y -> (x y, x y))
+por red. bet
+-> \x -> \y -> (x y, x y)
+necesita -> necesita -> devuelve
+.. 		 -> 	.. 		-> 	.. 
+(a -> b) -> a -> (b,b)
+
+
+e. flip (appDup const)
+flip :: (b -> a -> c) -> a -> b -> c
+flip f x y = (f y) x
+flip = (\f -> \x -> \y -> (f y) x)
+
+
+
+f. const (appDup id)
+-}
+
+-- definiciones
+-- 1. Definiciones en lambda
+flip   = \f -> \xF -> \yF -> (f yF) xF
+appDup = \fA -> \xA -> fA (xA, xA)
+const  = \c -> \c2 -> c
+
+-- 2. Sustitución de appDup con const
+-- fA = const
+appDup const = \xA -> const (xA, xA)
+
+-- 3. Reducción interna de const
+-- c = (xA, xA)
+appDup const = \xA -> (\c2 -> (xA, xA))
+
+-- 4. Aplicación de flip al resultado anterior
+-- f = (\xA -> \c2 -> (xA, xA))
+flip (appDup const) = \xF -> \yF -> (\xA -> \c2 -> (xA, xA)) yF xF
+
+-- 5. Primera Beta Reducción (entra yF en xA)
+\xF -> \yF -> (\c2 -> (yF, yF)) xF
+
+-- 6. Segunda Beta Reducción (entra xF en c2)
+-- Como el cuerpo (yF, yF) no tiene c2, xF desaparece
+\xF -> \yF -> (yF, yF)
+
+
+flip (appDup const) :: a \ -> b \-> (b, b)
