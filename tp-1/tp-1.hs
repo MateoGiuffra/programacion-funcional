@@ -1,4 +1,5 @@
 {-# OPTIONS_GHC -Wno-overlapping-patterns #-}
+
 import Debug.Trace (trace)
 
 -- Definiciones
@@ -69,7 +70,7 @@ cuadrupleDeUno = cuadruple 1
 doble (doble 2)
 (doble 2) + (doble 2)
 (2 + 2) + (doble 2)
-4 + (doble 2)
+(2 + 2) + (2 + 2)
 4 + (2 + 2)
 4 + 4
 8
@@ -91,8 +92,8 @@ Normal:
 cuadruple (cuadruple 2)
 Aplicativa:
     cuadruple (cuadruple 2)
-    cuadruple * (4 * 2)
-    cuadruple * 8
+    cuadruple (4 * 2)
+    cuadruple 8
     4 * 8
     32
 Normal:
@@ -190,6 +191,38 @@ twice f = g
 => doble 24
 => 24 + 24
 => 48
+
+
+twice f = (\x -> f (f x))
+((twice twice) doble) 3
+-> Por def de twice, siendo f = twice
+((\x -> twice (twice x)) doble) 3
+-> Reducción Beta, siendo x = doble
+(twice (twice doble)) 3
+-> Por def de twice, siengo f = twice doble
+(\x -> twice doble (twice doble x)) 3
+-> Reducción Beta, siendo x = 3
+twice doble (twice doble 3)
+-> Por def de twice, siendo f = doble
+(twice doble (\x -> doble (doble x) 3)) 
+-> Reducción Beta, siendo x = 3
+twice doble (doble (doble 3)) 
+siendo f = doble
+(\x -> doble (doble  x)) (doble (doble 3)) 
+-> Reduccíon Beta, siendo x = (doble (doble 3)) 
+doble (doble  (doble (doble 3)))
+-> Por def de doble, siendo x = 3
+doble (doble  (doble (3 + 3)))
+-> Por def de doble, siendo x = (3 + 3)
+doble (doble  ((3 + 3) + (3 + 3)))
+-> Por def de doble, siendo x = ((3 + 3) + (3 + 3)))
+doble (((3 + 3) + (3 + 3))) + ((3 + 3) + (3 + 3))))
+-> Por def de doble, siendo x = (((3 + 3) + (3 + 3))) + ((3 + 3) + (3 + 3))))
+(((3 + 3) + (3 + 3))) + ((3 + 3) + (3 + 3)))) + (((3 + 3) + (3 + 3))) + ((3 + 3) + (3 + 3))))
+-> por aritmetica y conmutatividad
+6 + 6 + 6 + 6 + 6 + 6 + 6 + 6
+-> por arit.
+48
 -}
 
 -- Debug para ver el ciclo de vida del primer `twice` (el externo)
@@ -214,6 +247,7 @@ debugPrimerTwice :: Int
 debugPrimerTwice =
   trace "[main] arranca ((twice twice) doble) 3 con debug" $
     ((twiceOuterT twiceInnerT) dobleT) 3
+
 -- yo uso ghci, me movi a la carpeta, puse :load main.hs print debugPrimerTwice para ver el resultado.
 
 {-
@@ -227,23 +261,26 @@ twice twice = \x -> twice (twice x)
 
 -}
 
-
-
 -- Ejercicio 9
 
---a. 
-f x = let (y,z) = (x,x) in y
+-- a.
+f x = let (y, z) = (x, x) in y
 f x = x
 
--- b. 
-f2 (x,y) = let z = x + y
-            in g (z,y)
-                where g (a,b) = a - b
+-- b.
+f2 (x, y) =
+  let z = x + y
+   in g (z, y)
+  where
+    g (a, b) = a - b
 f2 (x, y) = (x + y) - y
--- c. 
-f3 p = case p of 
-        (x,y) -> x
-f3 (x,y) = x
--- d. 
-f4 = \p -> let (x,y) = p in y
+
+-- c.
+f3 p = case p of
+  (x, y) -> x
+f3 (x, y) = x
+
+-- d.
+f4 = \p -> let (x, y) = p in y
+
 f4Refactor (_, y) = y
