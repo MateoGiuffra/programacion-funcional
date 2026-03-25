@@ -255,14 +255,6 @@ necesita -> necesita -> devuelve
 
 
 e. flip (appDup const)
-flip :: (b -> a -> c) -> a -> b -> c
-flip f x y = (f y) x
-flip = (\f -> \x -> \y -> (f y) x)
-
-
-
-f. const (appDup id)
--}
 
 -- definiciones
 -- 1. Definiciones en lambda
@@ -270,24 +262,36 @@ flip   = \f -> \xF -> \yF -> (f yF) xF
 appDup = \fA -> \xA -> fA (xA, xA)
 const  = \c -> \c2 -> c
 
--- 2. Sustitución de appDup con const
--- fA = const
-appDup const = \xA -> const (xA, xA)
+-> flip (appDup const)
+por def. de appDup, siendo fA = const
+-> flip (\const -> \xA -> const (xA, xA))
+por red. beta, siendo xA = xA
+-> flip (\xA -> const (xA, xA))
+por def. de const, donde c = (xA, xA),
+-> flip (\xA -> (\(xA, xA) -> \c2 -> (xA, xA)))
+por red. beta
+-> flip (\xA -> (\c2 -> (xA, xA)))
+por def. de flip, siendo f = (\xA -> (\c2 -> (xA, xA)))
+-> \(\xA -> (\c2 -> (xA, xA))) -> \xF -> \yF -> ((\xA -> (\c2 -> (xA, xA))) yF) xF 
+por red. beta
+-> \xF -> \yF -> ((\xA -> (\c2 -> (xA, xA))) yF) xF 
+por red. beta
+-> \xF -> \yF -> ((\c2 -> (yF, yF))) xF 
+por red. beta, (\c2 -> (yF, yF)) es const, por lo tanto, consume a xF pero devuelve el par
+-> \xF -> \yF -> (yF, yF) 
+flip (appDup const) :: a -> b -> (b, b)
 
--- 3. Reducción interna de const
--- c = (xA, xA)
-appDup const = \xA -> (\c2 -> (xA, xA))
-
--- 4. Aplicación de flip al resultado anterior
--- f = (\xA -> \c2 -> (xA, xA))
-flip (appDup const) = \xF -> \yF -> (\xA -> \c2 -> (xA, xA)) yF xF
-
--- 5. Primera Beta Reducción (entra yF en xA)
-\xF -> \yF -> (\c2 -> (yF, yF)) xF
-
--- 6. Segunda Beta Reducción (entra xF en c2)
--- Como el cuerpo (yF, yF) no tiene c2, xF desaparece
-\xF -> \yF -> (yF, yF)
 
 
-flip (appDup const) :: a \ -> b \-> (b, b)
+f. const (appDup id)
+por def de appDup, siendo fA = id
+const (\id -> \xA -> id (xA, xA))
+Reducción beta de ID dentro de la tupla
+-- x = (xA, xA)
+const (\xA -> (xA, xA))
+aplicamos const a (\xA -> (xA, xA))
+\c2 -> (\xA -> (xA, xA))
+const (appDup id) :: a -> (b -> (b, b))
+-}
+
+
