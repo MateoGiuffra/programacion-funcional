@@ -1,7 +1,12 @@
 {
-    "editor.quickSuggestions": false,
+    "editor.quickSuggestions": {
+        "comments": "off",
+        "strings": "off",
+        "other": "off"
+    },
     "editor.suggestOnTriggerCharacters": false,
     "editor.inlineSuggest.enabled": false,
     "haskell.plugin.hlint.diagnosticsOn": false,
-    "haskell.plugin.hlint.codeActionsOn": false
+    "haskell.plugin.hlint.codeActionsOn": false,
+    "haskell.plugin.ghcide-type-lenses.globalOn": false
 }
