@@ -1,5 +1,7 @@
 {
-  "editor.quickSuggestions": false,
-  "editor.suggestOnTriggerCharacters": false,
-  "editor.inlineSuggest.enabled": false
+    "editor.quickSuggestions": false,
+    "editor.suggestOnTriggerCharacters": false,
+    "editor.inlineSuggest.enabled": false,
+    "haskell.plugin.hlint.diagnosticsOn": false,
+    "haskell.plugin.hlint.codeActionsOn": false
 }
