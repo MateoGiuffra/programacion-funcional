@@ -1,4 +1,4 @@
--- Ejercicios de la clase 26/03/2026. Repasamos lo visto en la sección 1 y 2.
+-- Ejercicios de la clase 26/03/2026. Repasamos lo visto en las secciónes 1 y 2.
 
 -- definiciones
 doble :: Int -> Int
