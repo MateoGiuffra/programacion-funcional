@@ -186,10 +186,9 @@ compose (fst snd)
 fst     :: (a, b) -> a
 snd     :: (c, d) -> d
 ---------------------
-fst snd :: 
+fst snd :: Error
 
-(a, b)
-(c, d) -> d
+(a, b) != (c, d) -> d
 
 fst espera una tupla, pero snd es de tipo funcion que devuelve un valor.
 En este caso habria error.
@@ -202,23 +201,141 @@ curry         :: ((d,e) -> f) -> (d -> e -> f)
 ----------------------------------------
 uncurry curry :: 
 
-
+ primera vez
 (a           -> (b -> c))
               = 
 ((d,e) -> f) -> (d -> e -> f) 
-
-a        = (d, e) -> f
-(b -> c) = (d -> e -> f) 
-
+ segunda vez
 (b      -> c) 
     = 
 (d      -> (e -> f)) 
 
 
-
-uncurry       :: ((d -> (e -> f)) -> d -> (e -> f)) -> (((d -> c), d) -> (e -> f))
+ ---------> a = (d, e) -> f
+ ---------> b = d 
+ ---------> c = e -> f
+                                                     
+uncurry       :: (((d, e) -> f) -> d -> (e -> f)) -> (((d, e) -> f,d) -> (e -> f))
 curry         :: ((d,e) -> f) -> (d -> e -> f)
 ----------------------------------------
-uncurry curry :: ((d -> c), d) -> (e -> f)
+uncurry curry :: ((d, e) -> f, d) -> (e -> f)
+
+uncurry curry       :: ((d, e) -> f, d) -> (e -> f)
+snd                 :: (x, y) -> y
+---------------------------------
+(uncurry curry) snd :: Error
+
+(uncurry curry) espera una tupla: ((d, e) -> f, d)
+y snd es una funcion: (x, y) -> y. Incompatibilidad de tipos.
+
+c. (apply id) ((id apply) apply)
+
+-------------------------1--------------------------
+apply    :: (a -> b) -> (a -> b)
+id       :: x -> x
+--------------------
+apply id :: 
+
+a -> b 
+x -> x 
+--------> a = b = x
+
+apply    :: (x -> x) -> (x -> x)
+id       :: x -> x
+--------------------
+apply id :: x -> x
+--------------------------1-------------------------
+
+
+
+--------------------------2-------------------------
+id         ::  x2 -> x2
+apply      ::  (a1 -> b1) -> (a1 -> b1)
+----------------
+(id apply) ::
+
+-----> x2 = (a1 -> b1) -> (a1 -> b1)
+
+id         ::  ((a1 -> b1) -> (a1 -> b1)) -> ((a1 -> b1) -> (a1 -> b1))
+apply      ::  (a1 -> b1) -> (a1 -> b1)
+----------------
+(id apply) :: (a1 -> b1) -> (a1 -> b1)
+---------------------------2------------------------
+
+
+
+
+
+---------------------------3------------------------
+(id apply)       :: (a1 -> b1) -> (a1 -> b1)
+apply            :: (a2 -> b2) -> (a2 -> b2)
+-----------------------
+(id apply) apply ::        
+
+-------> (a1 -> b1) = (a2 -> b2) -> (a2 -> b2)
+
+(id apply)       :: ((a2 -> b2) -> (a2 -> b2)) -> ((a2 -> b2) -> (a2 -> b2))
+apply            :: (a2 -> b2) -> (a2 -> b2)
+-----------------------
+(id apply) apply ::  ((a2 -> b2) -> (a2 -> b2))
+--------------------------3-------------------------
+
+
+
+
+--------------------------4-------------------------
+apply id                      :: x -> x
+((id apply) apply)            :: (a2 -> b2) -> (a2 -> b2))
+-----------------------------------
+(apply id) ((id apply) apply) :: 
+
+
+-----> x = (a2 -> b2) -> (a2 -> b2))
+
+apply id                      :: (a2 -> b2) -> (a2 -> b2)) -> (a2 -> b2) -> (a2 -> b2))
+((id apply) apply)            :: (a2 -> b2) -> (a2 -> b2))
+-----------------------------------
+(apply id) ((id apply) apply) :: (a2 -> b2) -> (a2 -> b2))
+---------------------------4------------------------
+
+
+d. compose (compose doble doble)
+
+
+# 1
+compose :: (b -> c) -> ((a -> b) -> (a -> c))
+doble   :: Int -> Int
+-----------------
+compose doble :: 
+
+
+-----------> (b -> c) = Int
+-----------> c = Int
+
+
+compose :: Int -> ((a -> b) -> (a -> Int))
+doble   :: Int -> Int
+-----------------
+compose doble :: (a -> b) -> (a -> Int)
+
+# 1 
+
+
+
+# 2
+(compose doble)
+doble 
+---------------------
+(compose doble doble)
+# 2
+
+
+
+# 3
+compose 
+(compose doble doble)
+---------------------
+compose (compose doble doble)
+# 3
 
 -}
