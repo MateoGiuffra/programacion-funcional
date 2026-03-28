@@ -11,6 +11,8 @@ fst (x, y) = x
 snd :: (a, b) -> b
 snd (x, y) = y
 
+suma = (+)
+
 -- DEFINICIONES -- DEFINICIONES -- DEFINICIONES -- DEFINICIONES
 
 -- ej1
@@ -68,7 +70,7 @@ def de apply: f x = f x, donde f = apply
 -> \apply -> \x -> apply x
 por red beta
 -> (\x -> apply x) apply
-por def de apply, donde x (que seria la funcion f) es el ultimo apply
+por def de apply, donde x (que seria la función f) es el ultimo apply
 -> (\apply -> apply apply)
 por red beta
 -> apply
@@ -186,7 +188,7 @@ fst snd :: Error
 
 (a, b) != (c, d) -> d
 
-fst espera una tupla, pero snd es de tipo funcion que devuelve un valor.
+fst espera una tupla, pero snd es de tipo función que devuelve un valor.
 En este caso habria error.
 
 variante: compose fst snd
@@ -221,7 +223,7 @@ snd                 :: (x, y) -> y
 (uncurry curry) snd :: Error
 
 (uncurry curry) espera una tupla: ((d, e) -> f, d)
-y snd es una funcion: (x, y) -> y. Incompatibilidad de tipos.
+y snd es una función: (x, y) -> y. Incompatibilidad de tipos.
 
 c. (apply id) ((id apply) apply)
 
@@ -361,59 +363,59 @@ many n f x = compose f Main.id (many (n - 1) (compose f Main.id) x)
 Ejercicio 8
 
 a. (Int -> Int) -> Int -> Int
-curried: Es una función que toma una funcion que recibe y devuelve un entero, y devuelve una
-funcion que toma un entero y devuelve un entero.
-non-curried: Es una funcion que toma una funcion de entero en entero y un entero, y devuelve un entero.
+curried: Es una función que toma una función que recibe y devuelve un entero, y devuelve una
+función que toma un entero y devuelve un entero.
+non-curried: Es una función que toma una función de entero en entero y un entero, y devuelve un entero.
 
 b. (a -> b -> c) -> (a -> b) -> c
 curried: Es una función que toma una función (que toma un 'a' y un 'b' y devuelve un 'c') y devuelve
 una función que toma una función (que toma un 'a' y devuelve un 'b') y devuelve un valor de tipo 'c'.
-non-curried: Es una funcion que toma dos funciones y devuelve un valor c.
+non-curried: Es una función que toma dos funciones y devuelve un valor c.
 
 c. (a -> b, c -> d) -> (a, c) -> (b, d)
 curried: Es una función que toma una tupla de funciones (donde la primera es de 'a' en 'b' y la
 segunda de 'c' en 'd') y devuelve una función que toma una tupla de valores (de tipo 'a' y 'c')
 y devuelve una tupla de valores (de tipo 'b' y 'd').
-non-curried: Es una funcion que recibe una tupla de funciones y una tupla de valores (un a y un c)
+non-curried: Es una función que recibe una tupla de funciones y una tupla de valores (un a y un c)
 y devuelve una tupla de tipo (b, d).
 
 d. ((a, a) -> b) -> a -> b
-curried: Es una función que toma una funcion que toma una tupla de tipo ('a', 'a') y devuelve
-un valor de tipo 'b', y devuelve una funcion que toma un valor de tipo 'a' y devuelve un valor de tipo 'b'
-non-curriend: Es una funcion que recibe una funcion que toma una tupla de tipo (a, a) en b,
+curried: Es una función que toma una función que toma una tupla de tipo ('a', 'a') y devuelve
+un valor de tipo 'b', y devuelve una función que toma un valor de tipo 'a' y devuelve un valor de tipo 'b'
+non-curriend: Es una función que recibe una función que toma una tupla de tipo (a, a) en b,
 un valor a y devuelve un valor b.
 
 e. (a -> b -> c) -> b -> a -> c
-curried: Es una funcion que toma una funcion (que toma un a y devuelve una funcion que toma
-un b y devuelve un c) y devuelve una funcion que toma un valor de tipo b y devuelve
-una funcion que toma un valor de tipo a y devuelve un valor de tipo c.
-non-curried: Es una funcion que toma una funcion (que toma los valores a y b, y devuelve c),
+curried: Es una función que toma una función (que toma un a y devuelve una función que toma
+un b y devuelve un c) y devuelve una función que toma un valor de tipo b y devuelve
+una función que toma un valor de tipo a y devuelve un valor de tipo c.
+non-curried: Es una función que toma una función (que toma los valores a y b, y devuelve c),
 los valores b y a, y devuelve un valor c.
 
 f. (a -> b) -> (a, a) -> (b, b)
-curried: es una funcion que toma una funcion (que toma un a y devuelve un b) y devuelve
-una funcion que toma una tupla de tipo (a,a) y devuelve una tupla de tipo (b,b)
-noncurried: es una funcion que toma una funcion de tipo a en b, una tupla de tipo (a, a) y
+curried: es una función que toma una función (que toma un a y devuelve un b) y devuelve
+una función que toma una tupla de tipo (a,a) y devuelve una tupla de tipo (b,b)
+noncurried: es una función que toma una función de tipo a en b, una tupla de tipo (a, a) y
 devuelve una tupla de tipo (b, b)
 
 g. (​a -> b, a -> c) -> a -> (b, c)
-curried: Es una funcion que toma una tupla de funciones (donde la primera
-es de a en b y la segunda de a en c) y devuelve una funcion que toma un a y devuelve
+curried: Es una función que toma una tupla de funciones (donde la primera
+es de a en b y la segunda de a en c) y devuelve una función que toma un a y devuelve
 una tupla de tipo (b,c)
-noncurried: Es una funcion que toma una tupla de funciones (donde la primera es de tipo
+noncurried: Es una función que toma una tupla de funciones (donde la primera es de tipo
 a en b, y la seguna de tipo a en c), un valor a y devuelve una tupla de tipo (b, c)
 
 h. (a -> b -> c) -> (a -> b) -> a -> c
-curried: es una funcion que recibe una funcion (que toma un valor a y devuelve una funcion
-que toma un b y devuelve un c) y devuelve una funcion que toma una funcion de tipo a en b,
-y devuelve una funcion que toma a y devuelve c.
-noncurried: es una funcion que toma una funcion (que toma los valores a y b, y devuelve
-un valor c), una funcion de tipo a en b, un valor a y devuelve c.
+curried: es una función que recibe una función (que toma un valor a y devuelve una función
+que toma un b y devuelve un c) y devuelve una función que toma una función de tipo a en b,
+y devuelve una función que toma a y devuelve c.
+noncurried: es una función que toma una función (que toma los valores a y b, y devuelve
+un valor c), una función de tipo a en b, un valor a y devuelve c.
 
 i. a -> b -> a
-curried: Es una funcion que recibe un valor a y devuelve una funcion que toma un b y devuelve
+curried: Es una función que recibe un valor a y devuelve una función que toma un b y devuelve
 un valor de tipo a.
-noncurried: Es una funcion que toma los valores a y b, y devuelve a.
+noncurried: Es una función que toma los valores a y b, y devuelve a.
 
 Ejercicio 9)Dar expresiones equivalentes a las funciones definidas a continuación
 utilizando funciones como ​compose​, ​flip​, etc. (dadas en los ejercicios anteriores) y
@@ -423,7 +425,7 @@ b. timesTwoPlusThree x = suma (doble x) 3   = compose suma doble 3
 c. fourTimes f x = f (f (f (f x)))          = many 4 f x
 
 Ejercicio 10
-La seccion de operadores consiste en rodear un operador entre parentesis y poner uno de sus dos valores. Esto genera automaticamente una funcion
+La seccion de operadores consiste en rodear un operador entre parentesis y poner uno de sus dos valores. Esto genera automaticamente una función
 que aplica el operador entre el valor que ya pusiste y el que falta.
 Esto permite hacer cosas como definir doble de esta manera:
 - doble = (2*)

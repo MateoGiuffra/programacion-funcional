@@ -4,54 +4,195 @@ doble x = x + x
 cuadruple :: Int -> Int
 cuadruple x = 4 * x
 
+apply :: (a -> b) -> a -> b
 apply f = g
-    where g x = f x
+  where
+    g x = f x
 
+first :: (a, b) -> a
+first (a, b) = a
 
-first :: (a,b) -> a
-first (a,b) = a
-
-uflip :: ((b,a) -> c) -> (a,b) -> c
+uflip :: ((b, a) -> c) -> (a, b) -> c
 uflip f p = f (swap p)
 
-swap :: (a,b) -> (b,a)
+swap :: (a, b) -> (b, a)
 swap (x, y) = (y, x)
 
 twice :: (a -> a) -> (a -> a)
-twice f = g 
-    where g x = f (f x)
+twice f = g
+  where
+    g x = f (f x)
 
+{-
+Ejercicio 2:
+a. apply first
+
+apply 		:: (a -> b) -> a ->  b
+first 		:: (c,d) -> c
+-----------------------------------
+apply first ::
+
+(a 		-> b)
+	=
+(c,d) 	-> c
+
+ -------> b = c
+ -------> a = (c, d) = (b, d)
+
+apply 		:: ((b, d) -> b) -> (b, d) ->  b
+first 		:: (b,d) -> b
+-----------------------------------
+apply first :: (b, d) ->  b
+
+b. first (swap, uflip)
+
+first		  		:: (a, b) -> a
+(swap, uflip) 		:: ((c, d) -> (d, c), ((f,e) -> g) -> (e,f) -> g)
+-------------------------------------
+first (swap, uflip) ::
+
+(a, b)
+ =
+((c, d) -> (d, c), ((f,e) -> g) -> (e,f) -> g)
+
+--------> a = (c, d) -> (d, c)
+--------> b = ((f, e) -> g) -> (e,f) -> g
+
+first		  		:: ((c, d) -> (d, c), ((f, e) -> g) -> (e,f) -> g) -> (c, d) -> (d, c)
+(swap, uflip) 		:: ((c, d) -> (d, c), ((f,e) -> g) -> (e,f) -> g)
+-------------------------------------
+first (swap, uflip) :: (c, d) -> (d, c)
+
+c. twice doble
+
+twice		::  (a -> a) -> (a -> a)
+doble		::  Int -> Int
+-----------------------------
+twice doble ::
+
+Int -> Int
+(a -> a)
+ -------> a = Int
+
+twice		::  (Int -> Int) -> (Int -> Int)
+doble		::  Int -> Int
+-----------------------------
+twice doble :: Int -> Int
+
+d. twice twice
+twice :: (a -> a) -> (a -> a)
+twice :: (a2 -> a2) -> (a2 -> a2)
+---------------------
+twice twice ::
+
+(a 			-> 		a)
+(a2 -> a2) 	-> (a2 -> a2)
+
+(a2 -> a2) = a
+
+twice :: ((a2 -> a2) -> (a2 -> a2)) -> ((a2 -> a2) -> (a2 -> a2))
+twice :: (a2 -> a2) -> (a2 -> a2)
+---------------------
+twice twice :: (a2 -> a2) -> a2 -> a2
+
+e. twice uflip
+
+twice 		:: (a -> a) -> (a -> a)
+uflip 		:: ((c,b) -> d) -> (b,c) -> d
+---------------------------------------------------
+twice uflip :: ????
+
+(a 			  -> 		a)
+((c,b) -> d) -> (b,c) -> d
+
+a = (c,b) -> d
+a = (b,c) -> d
+como a es igual a (c, b) y (b, c) entonces b = c.
+para renombrar la igualdad entre b y c voy a usar la letra e
+a
+
+twice 		:: (((e,e) -> d) -> ((e,e) -> d)) -> (((e,e) -> d) -> ((e,e) -> d))
+uflip 		:: ((e,e) -> d) -> (e,e) -> d
+---------------------------------------------------
+twice uflip :: ((e,e) -> d) -> (e,e) -> d
+
+f. twice swap
+
+twice		:: (a -> a) -> a -> a
+swap		:: (b,c) -> (c,b)
+----------------------------------
+twice swap  :: ???
+
+(a 		-> 	a)
+(b,c) 	-> (c,b)
+como a es igual a (c, b) y (b, c) entonces b = c.
+para renombrar la igualdad entre b y c voy a usar la letra e
+
+twice		:: ((e,e) -> (e,e)) -> (e,e) -> (e,e)
+swap		:: (e,e) -> (e,e)
+----------------------------------
+twice swap  :: (e,e) -> (e,e)
+
+g. uflip swap
+
+uflip	   :: ((b, a) -> c) -> (a, b) -> c
+swap	   :: (d, e) -> (e, d)
+---------------------------
+uflip swap :: ????
+
+((b, a) -> c)
+
+(d, e) -> (e, d)
+
+(b, a) = (d, e)
+----> b = d
+----> a = e
+c = (e, d)
+----> c = (e, d)
+
+uflip	   :: ((d, e) -> (e, d)) -> (e, d) -> (e, d)
+swap	   :: (d, e) -> (e, d)
+---------------------------
+uflip swap :: (e, d) -> (e, d)
+
+h. (twice twice) swap :: (a, a) -> (a, a)
+El tipo seria (a, a) -> (a, a) porque como vimos en los puntos
+f, c, d y e, donde tenemos twice f, siendo f cualquier funcion,
+el tipo resultante de la expresion twice f es el tipo de f.
+
+En conclusion, el tipo de la expresion twice twice va a ser de tipo twice,
+y el tipo de la expresion de twice swap es el tipo desarollado en el
+punto f.
+
+-}
 
 -- ej 3:
 const :: a -> (b -> a)
 const x y = x
 
-appDup:: ((a,a) -> b) -> a -> b
+appDup :: ((a, a) -> b) -> a -> b
 -- appDup f x = f(x,x)
 appDup f = g
-    where g x = f (x, x)
-
+  where
+    g x = f (x, x)
 
 appDist :: (a -> b) -> (a, a) -> (b, b)
 appDist f (x, y) = (f x, f y)
 
-
-appFork :: (a -> b, a -> c) -> a -> (b,c)
+appFork :: (a -> b, a -> c) -> a -> (b, c)
 -- appFork (f, g) x = (f x, g x)
 appFork (f, g) = h
-    where h x = (f x, g x)
+  where
+    h x = (f x, g x)
 
-
-appPar :: (a -> c, b -> d ) -> (a, b) -> (c, d)
+appPar :: (a -> c, b -> d) -> (a, b) -> (c, d)
 appPar (f, g) (x, y) = (f x, g y)
-
 
 flip :: (b -> a -> c) -> a -> b -> c
 flip f x y = (f y) x
 
 subst :: (a -> (b -> c)) -> (a -> b) -> a -> c
 subst f g x = (f x) (g x)
-
 
 -- I. (a -> b, c -> d) -> ((a, c) -> (b, d)) = appPar
 -- II. ((a, a) -> b) -> (a -> b)  = appDup
@@ -66,28 +207,25 @@ Ejercicio 4) Para cada una de las siguientes expresiones decidir si poseen tipo.
 así indicar cuál es.
 a. 1 && 2 == 2  :: Error, no posee tipo. 1 no es un booleano valido en haskell.
 b. 1 + if 3 < 5 then 3 else 5 :: Int
-c. let par = (True, 4) 
+c. let par = (True, 4)
 	in (if first par then first par else second par) :: Error, no se puede tipar. El then devuelve un Bool y el else un Int
 d. (doble doble) 5 :: Error, doble espera un Int y no una función. No tiene tipo.
 e. doble (doble 5) :: Int
 f. twice first :: No posee tipo.First es de tipo (a, b) -> a y twice es de tipo (t -> t) -> (t -> t).
 Espera que first pueda recibir lo mismo que devuelve, pero no es el caso.
-g. (twice doble) doble :: No posee tipo. Doble espera un Int, no una funcion. 
+g. (twice doble) doble :: No posee tipo. Doble espera un Int, no una funcion.
 h. (twice twice) first :: No posee tipo. Misma razon que el punto F.
 i. apply apply :: (a -> b) -> (a -> b)
 
 -}
 
-
-
-
 -- Ejercicio 5) Dar dos ejemplos de expresiones que tengan cada uno de los siguientes tipos:
--- a. Bool: 
+-- a. Bool:
 esCinco :: Int -> Bool
 esCinco x = x == 5
 
 esPar :: Int -> Bool
-esPar x = x `mod` 2 == 0 
+esPar x = x `mod` 2 == 0
 
 -- b. (Int, Int)
 doblePar :: Int -> Int -> (Int, Int)
@@ -104,7 +242,6 @@ unoSiEsLaPrimerLetraDelAbecedario _ = 0
 unoSiEsLaUltimaLetraDelAbecedario :: Char -> Int
 unoSiEsLaUltimaLetraDelAbecedario 'z' = 1
 unoSiEsLaUltimaLetraDelAbecedario _ = 0
-
 
 -- d. (Int, Char) -> Bool
 -- hacer
@@ -133,15 +270,13 @@ Ejercicio 6) Para cada una de las siguientes expresiones, decir a cuál función
 ejercicio 3 es equivalente. Ofrecer argumentos de por qué son equivalentes.
 a. \p -> let (f, g) = p
 	in \x -> (f x, g x)
-appFork porque p es un par de funciones que se aplica a x. 
-
+appFork porque p es un par de funciones que se aplica a x.
 
 b. \f -> (\g -> (\x -> f x (g x))
 subst porque recibe dos funciones, una f y otra g y su parametro x. Despues aplica f x que debe devolver una funcion que acepte el resultado de aplicarle g a x.
 
-
 c. \f -> (\x -> (\y -> (f y) x)
-flip 
+flip
 
 d. \f -> (\px -> let (x, y) = px
 	in (f x, f y))
@@ -166,132 +301,27 @@ Ejercicio 7) Encontrar cuales de estas expresiones son equivalentes entre sí.
 Sugerencia: utilizar funciones anónimas es una forma interesante de encontrar
 equivalencias entre expresiones que denotan funciones.
 
-a. appFork (id,id)
+a. appFork (id, id) 
 
+appFork = (\x -> \y -> \z -> (x z, y z))
+-> en este caso, x = y = id
+appFork = (\id -> \id -> \z -> (id z , id z))
+por def de id, x = z en ambas instancias
+(z, z)
 
-appFork :: (a -> b, a -> c) -> a -> (b,c)
-appFork (f, g) x = (f x, g x)
--- en lamdba:
-\(f, g) -> \x -> (f x, g x)
+b. \f -> appDup (appDist f) 
 
-por def de appFork, siendo f = g = id
--> \(id, id) -> \x -> (id x, id x)
-por red. beta, siendo x = x
--> (id x, id x) 
-por def de id, siendo x = x
--> (x, id x) 
-por def de id, siendo x = x
--> (x, x) 
+c. appDup id 
+appDup = \f -> \x -> f (x, x)
+appDup = \id -> \x -> id (x, x)
+-> por def de id, xId = (x, x)
+(x, x)
 
-
-appFork (id, id) :: a -> (a, a)
-
-
-b. \f -> appDup (appDist f)
-
-appDup:: ((a,a) -> b) -> a -> b
-appDup f x = f(x,x)
--- en lamdba:
-appDub = \f -> \x -> f(x, x)
-
-appDist :: (a -> b) -> (a, a) -> (b, b)
-appDist f (x, y) = (f x, f y)
--- en lamdba:
-appDist = \f -> \(x, y) -> (f x, f y)
-
-\f -> appDup (appDist f)
-por def de appDup, siendo f = (appDist f)
-\f -> (\(appDist f) -> \x -> (appDist f) (x, x))
-por red. beta, siendo x = x
-\f -> \x -> appDist f (x, x)
-por def de appDist, donde f = f, siendo x = x, y = x
-\f -> \x -> (\f -> \(x, x) -> (f x, f x))
-por red beta
-\f -> \x -> (f x, f x)
-
-
-appDup (appDist f) :: (a -> b) -> a -> (b, b)
-
-c. appDup id
-\id -> \x -> id(x, x)
-por red beta
-\x -> id(x, x)
-
-appDup id :: a -> (a,a)
-
-d. appDup appFork
-
-
-appFork :: (a -> b, a -> c) -> a -> (b,c)
-appFork (f, g) x = (f x, g x)
--- lamdba:
-appFork = (\(f,g) -> \x -> (f x, g x))
-
-
-appDup appFork
-por def de addDup, siendo f = appFork
--> appFork (x,x)
-x tiene q ser una funcion, por lo tanto f = g = x
--> (x x', x x') 
-se le aplica la misma funcion a el mismo parametro, por lo tanto van a devolver lo mismo.
-				recibe una funcion que recibe a que devuelve b. Recibimos a. Devolvemos el resultado de la funcion aplicada
-appDup appFork :: 	(						a 			-> 	b)   -> a 				-> (b, b)
-appDup appFork :: (a -> b) -> a -> (b, b)
-
-Otra expliacion con lamdbas: 
-
-appDup appFork
-por def de addDup, siendo f = appFork
--> \appFork -> \x -> appFork(x, x)
-por red. bet
--> \x -> appFork(x, x)
-por def de appFork, siendo f = g = x
--> \x -> (\(x,x) -> \y -> (x y, x y))
-por red. bet
--> \x -> \y -> (x y, x y)
-necesita -> necesita -> devuelve
-.. 		 -> 	.. 		-> 	.. 
-(a -> b) -> a -> (b,b)
-
-
-e. flip (appDup const)
-
--- definiciones
--- 1. Definiciones en lambda
-flip   = \f -> \xF -> \yF -> (f yF) xF
-appDup = \fA -> \xA -> fA (xA, xA)
-const  = \c -> \c2 -> c
-
--> flip (appDup const)
-por def. de appDup, siendo fA = const
--> flip (\const -> \xA -> const (xA, xA))
-por red. beta, siendo xA = xA
--> flip (\xA -> const (xA, xA))
-por def. de const, donde c = (xA, xA),
--> flip (\xA -> (\(xA, xA) -> \c2 -> (xA, xA)))
-por red. beta
--> flip (\xA -> (\c2 -> (xA, xA)))
-por def. de flip, siendo f = (\xA -> (\c2 -> (xA, xA)))
--> \(\xA -> (\c2 -> (xA, xA))) -> \xF -> \yF -> ((\xA -> (\c2 -> (xA, xA))) yF) xF 
-por red. beta
--> \xF -> \yF -> ((\xA -> (\c2 -> (xA, xA))) yF) xF 
-por red. beta
--> \xF -> \yF -> ((\c2 -> (yF, yF))) xF 
-por red. beta, (\c2 -> (yF, yF)) es const, por lo tanto, consume a xF pero devuelve el par
--> \xF -> \yF -> (yF, yF) 
-flip (appDup const) :: a -> b -> (b, b)
-
-
-
+d. appDup appFork  
+e. flip (appDup const) 
 f. const (appDup id)
-por def de appDup, siendo fA = id
-const (\id -> \xA -> id (xA, xA))
-Reducción beta de ID dentro de la tupla
--- x = (xA, xA)
-const (\xA -> (xA, xA))
-aplicamos const a (\xA -> (xA, xA))
-\c2 -> (\xA -> (xA, xA))
-const (appDup id) :: a -> (b -> (b, b))
+
+Equivalencias: 
+appFork (id, id) <-> appDup id
+
 -}
-
-
