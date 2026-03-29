@@ -301,27 +301,80 @@ Ejercicio 7) Encontrar cuales de estas expresiones son equivalentes entre sí.
 Sugerencia: utilizar funciones anónimas es una forma interesante de encontrar
 equivalencias entre expresiones que denotan funciones.
 
+definiciones lamdba:
+flip = \f -> \x -> \y -> (f y) x
+appFork = (\x -> \y -> \z -> (x z, y z))
+appDup = \f -> \x -> f (x, x)
+const = \x -> \y -> x
+id = \x -> x
+
 a. appFork (id, id) 
 
 appFork = (\x -> \y -> \z -> (x z, y z))
--> en este caso, x = y = id
-appFork = (\id -> \id -> \z -> (id z , id z))
-por def de id, x = z en ambas instancias
-(z, z)
+appFork (id, id) 2
+-> en este caso, x = y = id, z = 2
+appFork = (\id -> \id -> \2 -> (id 2 , id 2))
+por def de id, x = 2 en ambas instancias
+(2, 2)
 
 b. \f -> appDup (appDist f) 
 
 c. appDup id 
 appDup = \f -> \x -> f (x, x)
-appDup = \id -> \x -> id (x, x)
--> por def de id, xId = (x, x)
-(x, x)
+appDup id 2
+appDup = \id -> \2 -> id (2, 2)
+-> por def de id, xId = (2, 2)
+(2, 2)
 
 d. appDup appFork  
-e. flip (appDup const) 
+appDup appFork 2 3
+appDup = \f -> \x -> f (x, x)
+\appFork -> \2 -> appFork (2, 2)
+appFork (2, 2) 3
+por def de appFork, (\(f, g) -> \x -> (f x, g x)),
+f <- 2
+g <- 2
+x <- 3
+(\(2, 2) -> \3 -> (2 3, 2 3))
+(2 3, 2 3)
+al ser en este caso, como  f y g son valores y no funciones, daria Error.
+
+
+e. flip (appDup const) 2 3 
+por def de flip, f <- (appDup const)
+-> h 2 3 
+por def de h, x <- 2
+-> k 3 
+por def de k, y <- 3
+-> (appDup const 3) 2 
+por def de appDup, f <- const
+-> (g 3) 2 
+por def de g, x <- 3
+-> const (3,3) 2 
+por def de const, x <- (3,3)
+-> g 2 
+por def de g, y <- 2
+-> (3, 3) 
+
+Es una funcion que toma dos valores y te devuelve
+una tupla compuesta por solo el segundo valor.
+
 f. const (appDup id)
+-> const (appDup id) 2 3
+por def de const, x = (appDup id), y = 2
+-> appDup id 3
+por def de appDup, f <- id
+-> g 3
+por def de g, x = 3
+-> id (3, 3)
+por def de id, x = (3, 3)
+-> (3, 3)
+
+Es una funcion que toma dos valores y te devuelve
+una tupla compuesta por solo el segundo valor.
 
 Equivalencias: 
 appFork (id, id) <-> appDup id
+const (appDup id) <-> flip (appDup const) 2 3 
 
 -}
