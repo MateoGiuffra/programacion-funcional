@@ -287,69 +287,113 @@ apply id                      :: (a2 -> b2) -> (a2 -> b2)) -> (a2 -> b2) -> (a2 
 
 d. compose (compose doble doble)
 
-# 1
-
-compose :: (b -> c) -> ((a -> b) -> (a -> c))
+####################1####################
+compose :: (b -> c) -> (a -> b) -> a -> c
 doble   :: Int -> Int
------------------
-compose doble ::
+--------------------------------------
+compose doble :: ???
 
------------> (b -> c) = Int -> Int
------------> c = Int
------------> b = Int
+(b -> c)
+Int -> Int
+ ----> b = Int
+ ----> c = Int
 
-compose :: (Int -> Int) -> ((a -> Int) -> (a -> Int))
+compose :: (Int -> c) -> (a -> Int) -> a -> Int
 doble   :: Int -> Int
------------------
-compose doble :: (a -> Int) -> (a -> Int)
+--------------------------------------
+compose doble :: (a -> Int) -> a -> Int
 
-# 1
+###################1#####################
 
-# 2
-(compose doble) ::  (a -> Int) -> (a -> Int)
-doble  :: Int -> Int
----------------------
-(compose doble doble)
+###################2#####################
+compose doble :: (a -> Int) -> a -> Int
+doble         :: Int -> Int
+---------------------------------------
+compose doble doble :: ??
 
 (a -> Int)
- =
 Int -> Int
 
-(compose doble) ::  (a -> Int) -> (a -> Int)
-doble  :: Int -> Int
----------------------
-(compose doble doble) ::
+a = Int
+Int = Int
 
-Int -> Int
-(a -> Int)
-------> a = Int
+compose doble :: (Int -> Int) -> Int -> Int
+doble         :: Int -> Int
+---------------------------------------
+compose doble doble :: Int -> Int
 
-(compose doble) ::  (Int -> Int) -> (Int -> Int)
-doble  :: Int -> Int
----------------------
-(compose doble doble) :: (Int -> Int)
+###################2#####################
 
-# 2
-
-# 3
-compose    :: (b2 -> c2) -> ((a2 -> b2) -> (a2 -> c2))
-(compose doble doble) :: Int -> Int
----------------------
-compose (compose doble doble)
+###################3#####################
+compose               :: (b2 -> c2) -> (a2 -> b2) -> a2 -> c2
+compose doble doble :: Int -> Int
+---------------------------------------
+compose (compose doble doble) ::  ???
 
 (b2 -> c2)
 Int -> Int
-b2 = Int
-c2 = Int
+ ---> b2 = Int
+ ---> c2 = Int
 
-compose    :: (Int -> Int) -> ((a2 -> Int) -> (a2 -> Int))
-(compose doble doble) :: Int -> Int
----------------------
-compose (compose doble doble) :: (a2 -> Int) -> (a2 -> Int)
+compose               :: (Int -> Int) -> (a2 -> Int) -> a2 -> Int
+compose doble doble :: Int -> Int
+---------------------------------------
+compose (compose doble doble) ::  (a2 -> Int) -> a2 -> Int
 
-# 3
+##################3######################
 
 e. (compose compose) doble doble
+
+##################1#####################
+compose :: (b -> c) -> (a -> b) -> a -> c
+compose :: (b2 -> c2) -> (a2 -> b2) -> a2 -> c2
+----------------------------------------
+compose compose :: ??
+
+(b -> c)
+
+(b2 -> c2) -> ((a2 -> b2) -> a2 -> c2)
+
+b = (b2 -> c2)
+c = (a2 -> b2) -> a2 -> c2
+
+compose :: ((b2 -> c2) -> (a2 -> b2) -> a2 -> c2) -> (a -> (b2 -> c2)) -> a -> (a2 -> b2) -> a2 -> c2
+compose :: (b2 -> c2) -> (a2 -> b2) -> a2 -> c2
+----------------------------------------
+compose compose :: (a -> b2 -> c2) -> a -> (a2 -> b2) -> a2 -> c2
+#################1######################
+
+#################2######################
+compose compose :: (a -> b2 -> c2) -> a -> (a2 -> b2) -> a2 -> c2
+doble           :: Int -> Int
+----------------------------------------
+compose compose doble :: ??
+
+(a -> (b2 -> c2))
+Int -> Int
+
+ --------> a = Int 
+ --------> b2 -> c2 = Int
+
+Se esperaba una funcion pero se recibio un Int, error de tipado.
+
+compose compose :: (a -> b2 -> c2) -> a -> (a2 -> b2) -> a2 -> c2
+doble           :: Int -> Int
+----------------------------------------
+compose compose doble :: Error
+
+#################2######################
+
+
+#################3######################
+(compose compose) doble
+doble
+----------------------------------------
+(compose compose) doble doble :: ?? Este no hace falta porque en el anterior paso fallo por tipo.
+#################3######################
+
+
+
 
 -}
 -- Ejercicio 7)
