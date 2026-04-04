@@ -1,3 +1,5 @@
+import Prelude hiding (uncurry)
+
 data Gusto = Chocolate | DulceDeLeche | Frutilla | Sambayon
   deriving (Show)
 
@@ -42,7 +44,6 @@ chocoHelate consH = consH Chocolate
     devuelve una funcion que espera dos gustos cierto?
     Este paso habria que indicarlo?
 -}
-
 -- ej 2
 data DigBin = O | I
 
@@ -150,6 +151,9 @@ compose f g x = f (g x)
 flip :: (b -> a -> c) -> a -> b -> c
 flip f x y = (f y) x
 
+swap :: (a, b) -> (b, a)
+swap (x, y) = (y, x)
+
 -- definiciones
 
 data Shape = Circle Float | Rect Float Float
@@ -168,74 +172,157 @@ construyeShNormal c = c 1.0
 
 -- compose (uncurry Rect) swap ::
 {-
-#################1#####################
+(compose (uncurry Rect)) swap
 
-uncurry :: (a -> b -> c) -> ((a, b) -> c)
-Rect    :: Float -> Float -> Shape
-------------------------------
-uncurry Rect
+###############1###############
+uncurry         :: (a -> b -> c) -> (a, b) -> c
+Rect            :: Float -> Float -> Shape
+-------------------------------
+(uncurry Rect)  :: ??
 
-(a -> b -> c)
 Float -> Float -> Shape
-
+(a -> b -> c
  -----> a = Float
  -----> b = Float
  -----> c = Shape
 
-uncurry :: (Float -> Float -> Shape) -> ((Float, Float) -> Shape)
-Rect    :: Float -> Float -> Shape
-----------------------------
-uncurry Rect :: (Float, Float) -> Shape
-#################1#####################
+uncurry         :: (Float -> Float -> Shape) -> (Float, Float) -> Shape
+Rect            :: Float -> Float -> Shape
+-------------------------------
+(uncurry Rect)  :: (Float, Float) -> Shape
 
-#################2#####################
-compose :: (e -> f) -> (d -> e) -> d -> f
-uncurry Rect :: (Float, Float) -> Shape
----------------------------
-compose (uncurry Rect)
+###############1###############
 
-(e -> f)
-(Float, Float) -> Shape
+###############2###############
+compose         :: (e -> f) -> (d -> e) -> d -> f
+(uncurry Rect)  :: (Float, Float) -> Shape
+-------------------------------
+compose (uncurry Rect) :: ???
 
- ------> e = (Float, Float)
- ------> f = Shape
+ -----> e = (Float, Float)
+ -----> f = Shape
 
-
-compose :: ((Float, Float) -> Shape) -> (d -> (Float, Float)) -> d -> Shape
-uncurry Rect :: (Float, Float) -> Shape
----------------------------
+compose         :: ((Float, Float) -> Shape) -> (d -> (Float, Float)) -> d -> Shape
+(uncurry Rect)  :: (Float, Float) -> Shape
+-------------------------------
 compose (uncurry Rect) :: (d -> (Float, Float)) -> d -> Shape
-#################2#####################
 
+###############2###############
 
-#################3#####################
+###############3###############
 compose (uncurry Rect) :: (d -> (Float, Float)) -> d -> Shape
-swap :: (x, y) -> (y, x)
--------------------------------------------
-compose (uncurry Rect) swap :: 
+swap  :: (x, y) -> (y, x)
+-------------------------------
+compose (uncurry Rect) swap :: ??
 
+(x, y) -> (y, x)
 (d -> (Float, Float))
-(x, y)
 
-d = x
-Float, Float = y
+d = (x, y)
+(y, x) = (Float, Float)
+por lo tanto
+y = Float
+x = Float
 
+d = (Float, Float)
 
-compose (uncurry Rect) :: (x -> y) -> x -> Shape
-swap :: (x, y) -> (y, x)
--------------------------------------------
-compose (uncurry Rect) swap :: 
-#################3#####################
+compose (uncurry Rect) :: ((Float, Float) -> (Float, Float)) ->(Float, Float) -> Shape
+swap  :: (x, y) -> (y, x)
+-------------------------------
+compose (uncurry Rect) swap :: (Float, Float) -> Shape
 
-
-
-
-
+###############3###############
 
 -}
 
--- uncurry Cucurucho ::
--- uncurry Rect swap ::
--- compose uncurry Pote ::
--- compose Just ::
+-- uncurry Cucurucho ::  (Gusto, Gusto) -> Helado
+-- uncurry Rect swap :: No tipa
+{-
+Rompe porque uncurry Rect espera una tupla y swap es una funcion
+-}
+-- compose uncurry Pote :: Gusto -> (Gusto, Gusto) -> Helado
+{-
+###############1###############
+compose :: (b -> c) -> (a -> b) -> a -> c
+uncurry :: (d -> e -> f) -> (d, e) -> f
+compose uncurry ::
+
+(d -> e -> f) -> ((d, e) -> f)
+(b -> c)
+
+ -----> b = (d -> e -> f)
+ -----> c = ((d, e) -> f)
+
+compose :: ((d -> e -> f) -> ((d, e) -> f)) -> (a -> (d -> e -> f)) -> a -> ((d, e) -> f)
+
+uncurry :: (d -> e -> f) -> (d, e) -> f
+compose uncurry :: (a -> d -> e -> f) -> a -> (d, e) -> f
+
+###############1###############
+
+###############2###############
+compose uncurry       :: (a -> d -> e -> f) -> a -> (d, e) -> f
+Pote                  :: Gusto -> Gusto -> Gusto -> Helado
+---------------------------------------------------------------
+compose uncurry Pote  :: ??
+
+Gusto -> Gusto -> Gusto -> Helado
+(a    -> d    -> e      -> f)
+ -----> a = Gusto
+ -----> d = Gusto
+ -----> e = Gusto
+ -----> f = Helado
+
+compose uncurry       :: (Gusto -> Gusto -> Gusto -> Helado) -> Gusto -> (Gusto, Gusto) -> Helado
+Pote                  :: Gusto -> Gusto -> Gusto -> Helado
+---------------------------------------------------------------
+compose uncurry Pote  :: Gusto -> (Gusto, Gusto) -> Helado
+
+###############2###############
+-}
+
+-- compose Just :: (a -> b) -> a -> Maybe b
 -- compose uncurry (Pote Chocolate) ::
+{-
+###############1###############
+compose           :: (b -> c) -> (a -> b) -> a -> c
+uncurry           :: (d -> e -> f) -> (d, e) -> f
+-------------------------------
+compose uncurry   :: ???
+
+
+(b -> c)
+(d -> e -> f) -> ((d, e) -> f)
+
+ --------> b = (d -> e -> f)
+ --------> c = ((d, e) -> f)
+
+
+compose           :: ((d -> e -> f) -> ((d, e) -> f)) -> (a -> (d -> e -> f)) -> a -> ((d, e) -> f)
+uncurry           :: (d -> e -> f) -> (d, e) -> f
+-------------------------------
+compose uncurry   :: (a -> d -> e -> f) -> a -> (d, e) -> f
+###############1###############
+
+
+###############2###############
+compose uncurry                   :: (a -> d -> e -> f) -> a -> (d, e) -> f
+(Pote Chocolate)                  :: Gusto -> Gusto -> Helado
+-------------------------------
+compose uncurry (Pote Chocolate)  :: ???
+
+(a -> d -> (e -> f))
+Gusto -> Gusto -> Helado
+
+a = Gusto
+d = Gusto
+e -> f = Helado
+
+
+Helado es una expresion atomica, no una funcion. Por lo tanto, error de tipo.
+
+falta un parametro? o en realidad esto (a -> d -> e -> f) dice dame un Gusto, otro gusto, un helado y te doy f, no sabemos
+que es f pero te lo doy?
+###############2###############
+
+-}
