@@ -135,3 +135,17 @@ siempreArmaCuadrado :: (Float -> Float -> Shape) -> Float -> Float -> Bool
 siempreArmaCuadrado f x y =
   let shape = f x y
    in esCuadrado shape
+
+-- 5) d)
+siempreArmaCuadrado_ :: (Float -> Shape) -> Bool
+siempreArmaCuadrado_ f = esCuadrado (f 1.0)
+
+-- Verifica si la función dada arma un cuadrado de cualquier tamaño cuando recibe cualquier otro número
+
+-- Para comprender si está está función hace lo esperado aplicar la función definida a:
+-- cuadrado
+-- Rect 2
+-- shapeNormal Rect
+-- \n -> if n < 10
+-- Then cuadrado (n-1)
+-- Else Circle n
