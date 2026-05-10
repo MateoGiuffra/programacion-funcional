@@ -32,7 +32,8 @@ f (Capa i p) = f p
 -- funciones auxiliares
 tieneCapaDeAceitunas :: Pizza -> Bool
 tieneCapaDeAceitunas (Capa (Aceitunas _) _) = True
-tieneCapaDeAceitunas _                      = False
+tieneCapaDeAceitunas _ = False
+
 -- funciones auxiliares
 
 -- pizza de testeo
@@ -65,34 +66,33 @@ pizzaTest = pizzaConJamonyAceitunas
 
 -- definiciones
 cantidadDeCapas :: Pizza -> Int
-cantidadDeCapas Prepizza   = 0
+cantidadDeCapas Prepizza = 0
 cantidadDeCapas (Capa i p) = cantidadDeCapas p + 1
 
 cantidadDeAceitunas :: Pizza -> Int
-cantidadDeAceitunas Prepizza               = 0
-cantidadDeAceitunas (Capa (Aceitunas c) p) = cantidadDeAceitunas p + c
-cantidadDeAceitunas (Capa _ p)             = cantidadDeAceitunas p + 0
+cantidadDeAceitunas Prepizza = 0
+cantidadDeAceitunas (Capa (Aceitunas c) p) = c + cantidadDeAceitunas p
+cantidadDeAceitunas (Capa _ p) = cantidadDeAceitunas p
 
 duplicarAceitunas :: Pizza -> Pizza
-duplicarAceitunas Prepizza               = Prepizza
+duplicarAceitunas Prepizza = Prepizza
 duplicarAceitunas (Capa (Aceitunas c) p) = Capa (Aceitunas (2 * c)) (duplicarAceitunas p)
-duplicarAceitunas (Capa i p)             = duplicarAceitunas p
+duplicarAceitunas (Capa i p) = duplicarAceitunas p
 
 sinLactosa :: Pizza -> Pizza
-sinLactosa Prepizza       = Prepizza
+sinLactosa Prepizza = Prepizza
 sinLactosa (Capa Queso p) = sinLactosa p
-sinLactosa (Capa i p)     = Capa i (sinLactosa p)
+sinLactosa (Capa i p) = Capa i (sinLactosa p)
 
 aptaIntolerantesLactosa :: Pizza -> Bool
-aptaIntolerantesLactosa Prepizza       = True
+aptaIntolerantesLactosa Prepizza = True
 aptaIntolerantesLactosa (Capa Queso p) = False
-aptaIntolerantesLactosa (Capa _ p)     = aptaIntolerantesLactosa p
+aptaIntolerantesLactosa (Capa _ p) = aptaIntolerantesLactosa p
 
 conDescripcionMejorada :: Pizza -> Pizza
-conDescripcionMejorada Prepizza               = Prepizza
-conDescripcionMejorada (Capa (Aceitunas c) p) = if tieneCapaDeAceitunas p
-                                                    then conDescripcionMejorada p
-                                                    else Capa (Aceitunas c) (conDescripcionMejorada p)
-conDescripcionMejorada (Capa i p)             = Capa i (conDescripcionMejorada p)
-
-
+conDescripcionMejorada Prepizza = Prepizza
+conDescripcionMejorada (Capa (Aceitunas c) p) =
+  if tieneCapaDeAceitunas p
+    then conDescripcionMejorada p
+    else Capa (Aceitunas c) (conDescripcionMejorada p)
+conDescripcionMejorada (Capa i p) = Capa i (conDescripcionMejorada p)
