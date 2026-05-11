@@ -78,10 +78,14 @@ esta (Registro n p) nombreABuscar =
 
 -- c. juntarPlanillas​, que toma dos planillas y genera una única planilla con
 -- los registros de ambas planillas.
+-- juntarPlanillas :: Planilla -> Planilla -> Planilla
+-- juntarPlanillas Fin Fin = Fin
+-- juntarPlanillas (Registro n1 p1) p2 = (Registro n1 (juntarPlanillas p1 p2))
+-- juntarPlanillas p1 (Registro n2 p2) = (Registro n2 (juntarPlanillas p1 p2))
+
 juntarPlanillas :: Planilla -> Planilla -> Planilla
-juntarPlanillas Fin Fin = Fin
-juntarPlanillas (Registro n1 p1) p2 = (Registro n1 (juntarPlanillas p1 p2))
-juntarPlanillas p1 (Registro n2 p2) = (Registro n2 (juntarPlanillas p1 p2))
+juntarPlanillas Fin p2 = p2
+juntarPlanillas (Registro n p1) p2 = Registro n (juntarPlanillas p1 p2)
 
 -- d. nivelesJerarquicos​, que describe la cantidad de niveles jerarquicos de
 -- un equipo dado.
