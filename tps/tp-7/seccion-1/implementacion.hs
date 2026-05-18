@@ -13,8 +13,16 @@ data Ingrediente
 -- Ej 1
 -- REGLAS:
 -- Base -> Prepizza esta en Pizza
--- Inductiva -> Si p esta en Pizza,
+-- Inductiva -> Si p esta en Pizza, e i :: Ingrediente
 --                 entonces Capa Ingrediente p esta en Pizza
+
+{-
+SAWADY
+Cso base: una Prepizza pertenece al conjunto Pizza
+Caso inductivo: Sea que i pertenece al conjunto Ingrediente, 
+                y p pertenece al conjunto de Pizza
+                  entonces Capa i p pertenece al conjunto Pizza
+-}
 
 -- Ej 2.
 -- f :: Pizza -> a

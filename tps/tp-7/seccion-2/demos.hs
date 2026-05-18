@@ -92,18 +92,38 @@ Prop.: ¿   ​largoDePlanilla (juntarPlanillas (Registro "Alan" (Registro "Edsg
 Dem.: 
     Lado izq.: 
             ​largoDePlanilla (juntarPlanillas (Registro "Alan" (Registro "Edsger" Fin)) ​p​)
-            
+        =                                                                                   juntarPlanillas, n <- "Alan", p1 <- (Registro "Edsger" Fin), p2 <- p
+            largoDePlanilla (Registro "Alan" juntarPlanillas ((Registro "Edsger" Fin) p))
+        =                                                                                   juntarPlanillas, n <- "Edsger", p1 <- Fin, p2 <- p
+            largoDePlanilla (Registro "Alan" (Registro "Edsger" juntarPlanillas (Fin p))
+        =                                                                                   juntarPlanillas
+            largoDePlanilla (Registro "Alan" (Registro "Edsger" p))
+        =                                                                                   largoDePlanilla, p <-  (Registro "Edsger" p)
+            largoDePlanilla (Registro "Edsger" p) + 1
+        =                                                                                   largoDePlanilla, p <- p
+            largoDePlanilla p + 1 + 1
+        =                                                                                   por aritm. 
+            largoDePlanilla + 2
+
+    Lado der.:
+            largoDePlanilla (Registro "Alan" (Registro "Edsger" Fin)) + largoDePlanilla ​p
+        =                                                                                   largoDePlanilla, p <-  (Registro "Edsger" p)
+            largoDePlanilla (Registro "Edsger" p) + 1 + largoDePlanilla ​p
+        =                                                                                   largoDePlanilla, p <- p
+            1 + 1 + largoDePlanilla ​p
+        =                                                                                   por aritm. 
+            2 + largoDePlanilla ​p
+        =                                                                                   por aritm. 
+            largoDePlanilla ​p + 2
+
+Cumple.
 
 d. para todo ​p​ :: Planilla ​. 
-    ​largoDePlanilla 
-    (juntarPlanillas (Registro "Alonzo" 
-                        (Registro "Alan" 
-                          (Registro "Edsger" Fin))) 
-                     ​p​) 
-   ​=​ largoDePlanilla (Registro "Alonzo" 
-                        (Registro "Alan" 
-                          (Registro "Edsger" Fin))) 
-       + largoDePlanilla ​p
 
+Prop.: ¿ ​largoDePlanilla (juntarPlanillas (Registro "Alonzo" (Registro "Alan" (Registro "Edsger" Fin))) p​) 
+   ​                                                    =​ 
+         largoDePlanilla (Registro "Alonzo" (Registro "Alan" (Registro "Edsger" Fin))) + largoDePlanilla ​p ? 
+v b                                                  
+        
 
 -}
