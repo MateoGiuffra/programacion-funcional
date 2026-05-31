@@ -37,7 +37,10 @@ heightQT (NodeQ q1 q2 q3 q4) = 1 + max4 (heightQT q1) (heightQT q2) (heightQT q3
 -- countLeavesQT :: QuadTree a -> Int, que describe la cantidad de hojas del árbol dado.
 countLeavesQT :: QuadTree a -> Int
 countLeavesQT (LeafQ x) = 0
-countLeavesQT (NodeQ q1 q2 q3 q4) = unoSi (isLeave q1 && isLeave q2 && isLeave q3 && isLeave q4) + countLeavesQT q1 + countLeavesQT q2 + countLeavesQT q3 + countLeavesQT q4
+countLeavesQT (NodeQ q1 q2 q3 q4) = unoSi (areLeaves q1 q2 q3 q4) + countLeavesQT q1 + countLeavesQT q2 + countLeavesQT q3 + countLeavesQT q4
+
+areLeaves :: QuadTree a -> QuadTree a -> QuadTree a -> QuadTree a -> Bool
+areLeaves q1 q2 q3 q4 = isLeave q1 && isLeave q2 && isLeave q3 && isLeave q4
 
 isLeave :: QuadTree a -> Bool
 isLeave (LeafQ _) = True
@@ -53,31 +56,51 @@ sizeQT (NodeQ q1 q2 q3 q4) = 1 + heightQT q1 + heightQT q2 + heightQT q3 + heigh
 -- compress :: QuadTree a -> QuadTree a, que describe el árbol resultante de transformar en hoja todos aquellos nodos para los que se cumpla que todas sus hojas tengan el mismo valor.
 compress :: (Eq a) => QuadTree a -> QuadTree a
 compress (LeafQ x) = (LeafQ x)
-compress (NodeQ q1 q2 q3 q4) = if areEquals (compress q1) (compress q2) (compress q3) (compress q4)
-                                then q1
-                                else (NodeQ (compress q1) (compress q2) (compress q3) (compress q4))
+compress (NodeQ q1 q2 q3 q4) =
+  if areEquals (compress q1) (compress q2) (compress q3) (compress q4)
+    then q1
+    else (NodeQ (compress q1) (compress q2) (compress q3) (compress q4))
 
-
-areEquals :: Eq a => QuadTree a -> QuadTree a -> QuadTree a -> QuadTree a -> Bool
+areEquals :: (Eq a) => QuadTree a -> QuadTree a -> QuadTree a -> QuadTree a -> Bool
 areEquals (LeafQ x1) (LeafQ x2) (LeafQ x3) (LeafQ x4) = x1 == x2 && x2 == x3 && x3 == x4
-areEquals _ _ _ _                                     = False
-
-apply :: (QuadTree a -> QuadTree a) -> QuadTree a -> QuadTree a
-apply f (NodeQ q1 q2 q3 q4) = (NodeQ (apply f q1) (apply f q2) (apply f q3) (apply f q4))
+areEquals _ _ _ _ = False
 
 -- v.
 -- uncompress :: QuadTree a -> QuadTree a
 -- que describe el árbol resultante de transformar en nodo (manteniendo el dato de la hoja correspondiente) todas aquellas hojas que no se encuentren en el nivel de la altura del árbol.
 uncompress :: QuadTree a -> QuadTree a
-uncompress (LeafQ x) = error "implementar"
-uncompress (NodeQ q1 q2 q3 q4) = error "implementar"
+uncompress (LeafQ x) = (NodeQ (LeafQ x) (LeafQ x) (LeafQ x) (LeafQ x))
+uncompress (NodeQ q1 q2 q3 q4) =
+  if areLeaves q1 q2 q3 q4
+    then (NodeQ q1 q2 q3 q4)
+    else (NodeQ (uncompress q1) (uncompress q2) (uncompress q3) (uncompress q4))
+
+-- no creo que sea asi pero bueno, lo dejamos estar
 
 -- vi.
 -- render :: Image -> Int -> Image, que describe la imagen dada en el tamaño dado.
 -- Precondición: el tamaño dado es potencia de 4 y es mayor o igual a la altura del árbol dado elevado a la 4ta potencia.
 render :: Image -> Int -> Image
-render (LeafQ c) t = error "implementar"
-render (NodeQ q1 q2 q3 q4) t = error "implementar"
+render (LeafQ x) height =
+  if 1 == height
+    then (LeafQ x)
+    else
+      ( NodeQ
+          (render (LeafQ x) (div height 4))
+          (render (LeafQ x) (div height 4))
+          (render (LeafQ x) (div height 4))
+          (render (LeafQ x) (div height 4))
+      )
+render (NodeQ q1 q2 q3 q4) height =
+  if 1 == height
+    then (NodeQ q1 q2 q3 q4)
+    else
+      ( NodeQ
+          (render q1 (div height 4))
+          (render q2 (div height 4))
+          (render q3 (div height 4))
+          (render q4 (div height 4))
+      )
 
 -- =============================================================================
 -- VALORES DE PRUEBA (CASOS DE PRUEBA)
