@@ -18,8 +18,8 @@ concat [] = []
 concat (xs : xss) = xs ++ concat xss
 
 elem :: (Eq a) => a -> [a] -> Bool
-elem _ [] = True
-elem e (x : xs) = x == e && elem e xs
+elem _ [] = False
+elem e (x : xs) = x == e || elem e xs
 
 all :: (a -> Bool) -> [a] -> Bool
 all f [] = True
@@ -59,4 +59,4 @@ unzip [] = ([], [])
 unzip ((a, b) : xs) = addInListPair (unzip xs) a b
 
 addInListPair :: ([a], [b]) -> a -> b -> ([a], [b])
-addInListPair (xs, ys) x y = (x: xs, y: ys)
+addInListPair (xs, ys) x y = (x : xs, y : ys)
