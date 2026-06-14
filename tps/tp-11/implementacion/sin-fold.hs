@@ -1,3 +1,4 @@
+import Prelude hiding (map, filter, foldr, foldr1, zipWith, scanr, or, and, all, any, length, countBy)
 -- Ejercicio 1)  Definir las siguientes funciones utilizando recursión estructural explícita 
 -- sobre Pizza: 
 
@@ -27,7 +28,10 @@ pizzaAnchoas :: Pizza
 pizzaAnchoas = Capa Anchoas (Capa Queso (Capa Salsa Prepizza))
 
 pizzaSoloAceitunas :: Pizza
-pizzaSoloAceitunas = Capa (Aceitunas 10) (Capa (Aceitunas 10) Prepizza)
+pizzaSoloAceitunas = Capa (Aceitunas 10) (Capa (Aceitunas 10) (Capa (Aceitunas 10) (Capa (Aceitunas 10) Prepizza)))
+
+pizzaVariada :: Pizza
+pizzaVariada = (Capa Anchoas (Capa Queso (Capa Queso ( Capa (Aceitunas 10) (Capa (Aceitunas 10) (Capa Jamón Prepizza))))))
 
 -- alias de test conveniente
 pizzaTest :: Pizza
@@ -73,9 +77,12 @@ esQueso :: Ingrediente -> Bool
 esQueso Queso = True
 esQueso _     = False
 
-
+duplicarAceitunas :: Ingrediente -> Ingrediente
+duplicarAceitunas (Aceitunas n) = (Aceitunas (n * 2))
+duplicarAceitunas x = x
+ 
 sinLactosa :: Pizza -> Pizza 
-sinLactosa p = soloLasCapasQue esQueso p
+sinLactosa p = soloLasCapasQue (not . esQueso) p
 
 -- b.
 aptaIntolerantesLactosa :: Pizza -> Bool 
@@ -85,34 +92,43 @@ cantidadDeQueso :: Pizza -> Int
 cantidadDeQueso p = cantidadCapasQueCumplen esQueso p
 -- d.
 conElDobleDeAceitunas :: Pizza -> Pizza
-conElDobleDeAceitunas p = conCapasTransformadas 
-                                (\i -> case i of
-                                    (Aceitunas n) -> (Aceitunas (n * 2))
-                                    x             -> x) p
-
--- Ejercicio 3)  Definir,  
--- que expresa la definición de fold para la estructura de Pizza.                                    
-pizzaProcesada :: (Ingrediente -> b -> b) -> b -> Pizza -> b
-pizzaProcesada f z Prepizza = z
-pizzaProcesada f z (Capa i p) = f i (pizzaProcesada f z p)
+conElDobleDeAceitunas p = conCapasTransformadas duplicarAceitunas p
 
 
--- Ejercicio 4)  
--- Resolver todas las funciones de los puntos 1) y 2) utilizando la función pizzaProcesada.
-cantidadCapasQueCumplen' :: (Ingrediente -> Bool) -> Pizza -> Int 
-cantidadCapasQueCumplen' f p = pizzaProcesada (\i rs -> unoSi (f i) + rs) 0 p
 
-
--- cantidadCapasQueCumplen' esQueso 0 (Capa Queso Prepizza)
--- -- def de cantidadCapasQueCumplen', f <- (\i -> unoSi (esQueso i) + rs), z <- 0, p <- (Capa Queso Prepizza)
--- (\i rs -> unoSi (esQueso i) + rs) Queso (pizzaProcesada (\i rs -> unoSi (esQueso i) + rs) 0 Prepizza)
--- -- por beta red, i <- Queso, rs <- (pizzaProcesada esQueso 0 Prepizza)
--- (unoSi (esQueso Queso) + (pizzaProcesada (\i rs -> unoSi (esQueso i) + rs) 0 Prepizza)) 
--- -- por def de esQueso
--- (unoSi True + (pizzaProcesada (\i rs -> unoSi (esQueso i) + rs) + rs) 0 Prepizza)) 
--- -- def unoSi
--- (1 + (pizzaProcesada (\i rs -> unoSi (esQueso i) + rs) + rs) 0 Prepizza)
--- -- def pizzaProcesada, z <- 0
--- (1 + 0)
--- -- por arit
--- 1 
+-- Ejercicio 7)  Definir  las  siguientes  funciones  de  esquemas  sobre  listas,  utilizando 
+-- recursión estructural de forma explícita: 
+--a.
+map :: (a -> b) -> [a] -> [b] 
+map f [] = []
+map f (x:xs) = f x : map f xs
+--b.
+filter :: (a -> Bool) -> [a] -> [a] 
+filter _ [] = []
+filter f (x: xs) = consSi f x (filter f xs)
+--c.
+foldr :: (a -> b -> b) -> b -> [a] -> b 
+foldr f z [] = z 
+foldr f z (x:xs) = f x (foldr f z xs)
+--d.
+recr :: b -> (a -> [a] -> b -> b) -> [a] -> b 
+recr z f [] = z
+recr z f (x: xs) = f x xs (recr z f xs)
+--e.
+foldr1 :: (a -> a -> a) -> [a] -> a 
+foldr1 f [] = error "No puede ser lista vacia"
+foldr1 f (x:xs) = f x (foldr1 f xs)
+--f.
+zipWith :: (a -> b -> c) -> [a] -> [b] -> [c] 
+zipWith f [] _  = []
+zipWith f _ []  = []
+zipWith f (x:xs) (y:ys) = f x y : zipWith f xs ys
+--g. (Desafío) 
+scanr :: (a -> b -> b) -> b -> [a] -> [b] 
+-- te devuelve una lista con todos los pasos intermedios que se calcularon durante la recursión.
+-- foldr (+) 0 [1, 2, 3] -> 6
+-- scanr (+) 0 [1, 2, 3] -> [6, 5, 3, 0]
+-- primer elemento es el resultado,..., ultimo elemento es el caso base. 
+scanr f z [] = [z]
+scanr f z (x: xs) = f x z : (scanr f z xs)
+    -- let (y: ys) =(scanr f z xs)  in f x y : ys
