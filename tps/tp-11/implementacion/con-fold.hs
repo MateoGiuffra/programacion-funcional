@@ -1,6 +1,10 @@
+-- imports
 import Prelude hiding (map, drop, elemAt, take, takeWhile, sum, filter, foldr, foldr1, zipWith, scanr, or, and, all, any, length, countBy)
--- Ejercicio 1)  Definir las siguientes funciones utilizando recursión estructural explícita 
--- sobre Pizza: 
+twice :: (a -> a) -> (a -> a)
+twice f = g
+  where
+    g x = f (f x)
+-- imports
 
 -- auxs
 unoSi :: Bool -> Int
@@ -24,6 +28,9 @@ duplicarAceitunas x = x
 
 -- auxs
 
+
+-- Ejercicio 1)  Definir las siguientes funciones utilizando recursión estructural explícita 
+-- sobre Pizza: 
 
 -- pizzas de testeo
 pizzaVacia :: Pizza
@@ -358,8 +365,142 @@ filter :: (Bool -> Bool) -> [Bool] -> [Bool]
 filter (flip const (+)) :: [Bool] -> [Bool]
 
 f.map const 
+map :: (a -> b) -> [a] -> [b]
+const :: c -> d -> c
+-----------------------------
+map const :: ??
+
+reemplazo
+a -> b
+c -> d -> c
+
+a = c
+b = d -> c
+
+map :: (c -> d -> c) -> [c] -> [d -> c]
+const :: c -> d -> c
+-----------------------------
+map const :: [c] -> [d -> c]
+map const :: [a] -> [b -> a]
+
 g.map twice 
+
+map :: (a -> b) -> [a] -> [b] 
+twice :: (c -> c) -> (c -> c)
+--------------------------------
+map twice :: ??
+
+reemplazo
+(a -> b)
+(c -> c) -> (c -> c)
+a = (c -> c) = b
+
+
+map :: (c -> c -> c -> c) -> [c -> c] -> [c -> c] 
+twice :: (c -> c) -> (c -> c)
+--------------------------------
+map twice :: [c -> c] -> [c -> c] 
+map twice :: [a -> a] -> [a -> a] 
+
+
 h.foldr twice 
+foldr  :: (a -> b -> b) -> b -> [a] -> b
+twice :: (c -> c) -> (c -> c)
+------------------------------------------------------
+foldr twice :: ?? 
+
+reemplazo
+(a       -> (b -> b))
+(c -> c) -> (c -> c)
+
+a = (c -> c) 
+b = c 
+
+foldr  :: ((c -> c) -> c -> c) -> c -> [c -> c] -> c
+twice :: (c -> c) -> (c -> c)
+------------------------------------------------------
+foldr twice :: c -> [c -> c] -> c
+foldr twice :: a -> [a -> a] -> a
+
+
 i.zipWith fst 
+
+zipWith :: (a -> b -> c) -> [a] -> [b] -> [c] 
+fst     :: (d, e) -> d
+--------------------------------------- 
+zipWith fst :: ??
+
+-- reemplazo
+a = (d, e)
+d = b -> c  -- d es una funcion!
+
+-- entonces
+a = (b -> c, e)
+
+-- y fst queda:
+fst :: (b -> c, e) -> (b -> c)  -- d reemplazado por b -> c
+
+-- zipWith fst:
+zipWith :: ((b->c, e) -> b -> c) -> [(b->c, e)] -> [b] -> [c]
+fst     :: (b->c, e) -> (b->c)
+---------------------------------------
+zipWith fst :: [(b->c, e)] -> [b] -> [c]
+
+
+
 j.foldr (\x r z -> (x, z) : r z) (const []) 
+
+-- nombro por comodidad
+lamdba = (\x r z -> (x, z) : r z)
+
+-- definicion de tipos
+lamdba :: a -> (b -> [(a, b)]) -> b -> [(a, b)]
+const []) :: c -> [d] 
+
+-- planteos:
+
+planteo.1
+foldr lamdba :: ??
+(const []) :: c -> [d]
+---------------------------------------------------------
+foldr lamdba (const []) :: ??
+
+planteo.2
+foldr :: (a -> b -> b) -> b -> [a] -> b
+lamdba :: a2 -> (b2 -> [(a2, b2)]) -> b2 -> [(a2, b2)]
+---------------------------------------------------------
+foldr lamdba :: ??
+
+reemplazo-planteo.2
+(a ->         b          ->       b)
+a2 -> (b2 -> [(a2, b2)]) -> (b2 -> [(a2, b2)])
+
+a = a2
+b = (b2 -> [(a2, b2)])
+
+resolucion-planteo.2
+foldr  :: (a2 -> (b2 -> [(a2, b2)]) -> (b2 -> [(a2, b2)])) -> (b2 -> [(a2, b2)]) -> [a2] -> (b2 -> [(a2, b2)])
+lamdba :: a2 -> (b2 -> [(a2, b2)]) -> b2 -> [(a2, b2)]
+---------------------------------------------------------
+foldr lamdba ::  (b2 -> [(a2, b2)]) -> [a2] -> b2 -> [(a2, b2)]
+
+resolucion-planteo.1
+foldr lamdba :: (b2 -> [(a2, b2)]) -> [a2] -> b2 -> [(a2, b2)]
+(const []) :: c -> [d]
+---------------------------------------------------------
+foldr lamdba (const []) :: ??
+
+
+(b2 -> [(a2, b2)])
+c   -> d
+c = b2
+d = [(a2, b2)] -- aca [(a2, b2)] no pasa a ser d, se deja como esta porque en el sistema de tipos gana el tipo con mas detalle
+
+
+resolucion-planteo.1
+foldr lamdba :: (b2 -> [(a2, b2)]) -> [a2] -> b2 -> [(a2, b2)]
+(const []) :: c -> [d] -- esto no se si lo puedo cambiar
+---------------------------------------------------------
+foldr lamdba (const []) :: [a2] -> b2 -> [(a2, b2)]
+
 -}
