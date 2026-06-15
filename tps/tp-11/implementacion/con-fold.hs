@@ -129,7 +129,7 @@ conCapasDe :: Pizza -> Pizza -> Pizza
 conCapasDe p1 p2 = pizzaProcesada (\i rs -> Capa i rs) p1 p2
 -- e.
 primerasNCapas :: Int -> Pizza -> Pizza 
-primerasNCapas n p = pizzaProcesada pasoNCapas siemprePrepizza p n
+primerasNCapas = flip (pizzaProcesada pasoNCapas siemprePrepizza)
 
 pasoNCapas :: Ingrediente -> (Int -> Pizza) -> Int -> Pizza
 pasoNCapas i rs k = if k == 0 
