@@ -140,5 +140,91 @@ union   = UnionsMS valid invalid
             [(1, 1)] ++ [(1, -1)] -> [(1, 0), (1, -1)]
 
 
+Demostrar la siguiente propiedad: evalMSE . simpMSE = evalMSE
 
+por principio de extencionalidad, sea mse un multiset cualquiera.
+
+¿ para todo mse. (evalMSE . simpMSE) mse = evalMSE mse ?
+
+por def. de compose, es equivalente a decir:
+
+¿ para todo mse. evalMSE (simpMSE mse) = evalMSE mse ?
+
+por principio de inducción estructural sobre la estructura mse
+
+dem:
+
+casoBase) mse = EmptyMS ¿ evalMSE (simpMSE EmptyMS) = evalMSE EmptyMS ?
+
+casoInductivo1) mse = (AddMS y ms)
+HI) ¡ evalMSE (simpMSE ms) = evalMSE ms !
+TI) ¿ evalMSE (simpMSE (AddMS y ms)) = evalMSE (AddMS y ms) ?
+
+casoInductivo2) mse = (RemoveMS y ms)
+HI) ¡ evalMSE (simpMSE ms) = evalMSE ms !
+TI) ¿ evalMSE (simpMSE (RemoveMS y ms)) = evalMSE (RemoveMS y ms) ?
+
+casoInductivo3) mse = (UnionMS ms1 ms2)
+HI1) ¡ evalMSE (simpMSE ms1) = evalMSE ms1 !
+HI2) ¡ evalMSE (simpMSE ms2) = evalMSE ms2 !
+TI) ¿ evalMSE (simpMSE (UnionMS ms1 ms2)) = evalMSE (UnionMS ms1 ms2) ?
+
+casoInductivo4) mse = (MapMS f ms)
+HI) ¡ evalMSE (simpMSE ms) = evalMSE ms !
+TI) ¿ evalMSE (simpMSE (MapMS f ms)) = evalMSE (MapMS f ms) ?
+
+Demuestro: 
+
+casoBase)
+LI) evalMSE (simpMSE EmptyMS)
+=                                   --simpMSE.1
+    evalMSE EmptyMS
+
+LD) evalMSE EmptyMS
+
+VALE ESTE caso
+
+casoInductivo1)
+LI)     evalMSE (simpMSE (AddMS y ms))
+=                                           --simpMSE.2
+        evalMSE AddMS y (simpMSE ms)
+=                                           -- evalMSE.2
+        y : evalMSE (simpMSE ms)
+=                                           -- HI
+        y : evalMSE ms
+
+LD)     evalMSE (AddMS y ms)
+=                                           -- evalMSE.2
+        y : evalMSE ms
+
+VALE ESTE caso
+
+casoInductivo2)
+LI)     evalMSE (simpMSE (RemoveMS y ms))
+=                                               --simpMSE.3
+        evalMSE (simpRemove y (simpMSE ms))
+=                                               --Lema
+        evalMSE (simpMSE ms)
+=       
+        evalMSE ms
+
+LD)     evalMSE (RemoveMS y ms)
+=                                               --evalMSE.3
+        quitar y (evalMSE ms)
+
+casoInductivo3)
+LI)     evalMSE (simpMSE (UnionMS ms1 ms2))
+=                                                      --simpMSE.4
+        evalMSE (simpUnion (simpMSE ms1) (simpMSE ms2))
+=                                                      -- LEMA
+        evalMSE (simpMSE ms1) ++ evalMSE (simpMSE ms2)
+=                                                       -- HI1 y HI2
+        evalMSE ms1 ++ evalMSE ms2
+
+LD)     evalMSE (UnionMS ms1 ms2)
+=                                                      --evalMSE.4
+        evalMSE e1 ++ evalMSE e2
+=
+
+VALe ESTE caso
 
