@@ -94,19 +94,15 @@ update f x ((v, c): ps) = if v == x
 evalMSE :: Eq a => MSExp a -> [a]
 -- que describe la lista de todas las ocurrencias de los
 -- elementos del multiset dado.
-evalMSE ms = evalMSEWith id ms
-
-evalMSEWith :: Eq a => (a -> a) -> MSExp a -> [a]
-evalMSEWith f EmptyMS           = []
-evalMSEWith f (AddMS y ms)      = f y : evalMSEWith f ms
-evalMSEWith f (RemoveMS y ms)   = delete (f y) (evalMSEWith f ms)
-evalMSEWith f (UnionMS ms1 ms2) = (evalMSEWith f ms1) ++ (evalMSEWith f ms2)  
-evalMSEWith f (MapMS g ms)      = evalMSEWith (f . g) ms
+evalMSE EmptyMS           = []
+evalMSE (AddMS y ms)      = y : evalMSE f ms
+evalMSE (RemoveMS y ms)   = delete y (evalMSE f ms)
+evalMSE (UnionMS ms1 ms2) = (evalMSE ms1) ++ (evalMSE ms2)  
+evalMSE (MapMS f ms)      = map f (evalMSE ms)
 
 delete :: Eq a => a -> [a] -> [a]
 delete _ [] = []
-delete e (x: xs) = if x == e then delete xs else x : delete xs
-
+delete e (x: xs) = if x == e then delete e xs else x : delete e xs
 -- e
 simpMSE :: MSExp a -> MSExp a
 -- que, suponiendo que recibe una expresión de multiset
@@ -114,13 +110,13 @@ simpMSE :: MSExp a -> MSExp a
 -- todos los lugares posibles:
 simpMSE EmptyMS           = EmptyMS
 simpMSE (AddMS y ms)      = AddMS y (simpMSE ms)
-simpMSE (RemoveMS y ms)   = simpRemove simpMSE ms
+simpMSE (RemoveMS y ms)   = simpRemove y (simpMSE ms)
 simpMSE (UnionMS ms1 ms2) = simpUnion (simpMSE ms1) (simpMSE ms2)  
 simpMSE (MapMS f ms)      = simpMap f (simpMSE ms)
 
-simpRemove :: MSExp a -> MSExp a
-simpRemove (RemoveMS y (AddMS x ms)) = if y == x then ms else (RemoveMS y (AddMS x ms))
-simpRemove e = e
+simpRemove :: a -> MSExp a -> MSExp a
+simpRemove y (AddMS x ms) = if y == x then ms else (RemoveMS y (AddMS x ms))
+simpRemove y e = e 
 
 simpUnion :: MSExp a ->  MSExp a -> MSExp a
 simpUnion EmptyMS e  = e
