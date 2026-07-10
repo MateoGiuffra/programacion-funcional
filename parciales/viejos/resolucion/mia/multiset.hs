@@ -101,7 +101,7 @@ evalMSEWith f EmptyMS           = []
 evalMSEWith f (AddMS y ms)      = f y : evalMSEWith f ms
 evalMSEWith f (RemoveMS y ms)   = delete (f y) (evalMSEWith f ms)
 evalMSEWith f (UnionMS ms1 ms2) = (evalMSEWith f ms1) ++ (evalMSEWith f ms2)  
-evalMSEWith f (MapMS g ms)      = evalMSEWith (g . f) ms
+evalMSEWith f (MapMS g ms)      = evalMSEWith (f . g) ms
 
 delete :: Eq a => a -> [a] -> [a]
 delete _ [] = []
