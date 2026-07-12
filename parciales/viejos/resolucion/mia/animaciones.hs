@@ -100,19 +100,21 @@ unirTiempo (x: xs) (y: ys) = max x y : unirTiempo xs ys
 -- para todo k >= 0. 
 --     duracion . (alargar k) = (k*) . duracion
 -- por principio de extensionalidad, siendo a una animacion cualquiera, quiero ver que:
--- ¿ (duracion . (alargar k)) a = ((k*) . duracion) a ? 
+-- ¿ para todo a. (duracion . (alargar k)) a = ((k*) . duracion) a ? 
 
 -- por def. de compose, es equivalente a decir:
 
--- ¿ duracion (alargar k a) =  k * (duracion a) ? 
+-- ¿ para todo a. duracion (alargar k a) =  k * (duracion a) ? 
+
+-- por principio de induccion estructural sobre la estructura de a
 
 -- casoBase1)
--- siendo n un numero cualquiera >= 0
+-- siendo n un numero cualquiera
 -- a = Espera n
 -- ¿ duracion (alargar k (Espera n)) =  k * (duracion (Espera n)) ? 
 
 -- casoBase2)
--- siendo n un numero cualqueira >= 0 y ac una accion cualquiera
+-- siendo n un numero cualquiera y ac una accion cualquiera
 -- a = Mov n ac
 -- ¿ duracion (alargar k (Mov n ac)) =  k * (duracion (Mov n ac)) ? 
 
