@@ -78,6 +78,14 @@ respeta esta forma.
 
 ## Guía para generar nuevos parciales de práctica (`.md` en esta carpeta)
 
+**Restricción dura, confirmada por el usuario:** los tipos recursivos NO pueden tener un
+campo de tipo `[T]` (una lista del propio tipo recursivo) en ningún constructor — eso son
+"árboles generales" (rose trees) y no entran en el temario de esta materia. Todo constructor
+recursivo debe tener una cantidad **fija** de posiciones recursivas del mismo tipo (una,
+dos, tres...), como en todos los parciales viejos relevados (`ThreeT` tiene 3 hijos fijos,
+`Red`/`Conducto` tienen como máximo 2, `PrefixT` tiene 3, `Spaceship` tiene 2, etc.). Antes
+de fijar un ADT nuevo, revisar que ningún constructor use `[NombreDelTipo]`.
+
 Cuando se pida generar un parcial nuevo para practicar:
 
 1. **Elegir un dominio narrativo distinto cada vez** para variedad rica. Evitar reciclar el
