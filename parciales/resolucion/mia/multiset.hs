@@ -343,7 +343,7 @@ occursMESWith' x f ms = foldMSExp
         ms x f
 
 filterMSE' :: (a -> Bool) -> MSExp a -> MSExp a
-filterMSE' f ms = foldMSExp
+filterMSE' = flip (foldMSExp
         (\f -> EmptyMS)
         (\y rs f -> if f y
                         then AddMS y (rs f)
@@ -352,16 +352,14 @@ filterMSE' f ms = foldMSExp
                         then RemoveMS y (rs f)
                         else rs f)
         (\rs1 rs2 f -> UnionMS (rs1 f) (rs2 f))
-        (\g rs f    -> MapMS g (rs (f . g)))
-        ms f
+        (\g rs f    -> MapMS g (rs (f . g))))
 
 balance' :: Eq a => (a -> a) -> MSExp a -> [(a, Int)]
-balance' f ms = foldMSExp (\f -> [])
+balance' = flip (foldMSExp (\f -> [])
                           (\y rs f -> update (+1) (f y) (rs f))
                           (\y rs f -> update (subtract 1) (f y) (rs f))
                           (\rs1 rs2 f -> rs1 f ++ rs2 f)
-                          (\g rs f -> rs (f . g))
-                          ms f
+                          (\g rs f -> rs (f . g)))
 
 evalMSE' :: Eq a => MSExp a -> [a]
 evalMSE' = foldMSExp []
