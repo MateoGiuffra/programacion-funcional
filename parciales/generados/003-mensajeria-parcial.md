@@ -29,7 +29,7 @@ m3 = Respuesta (Respuesta (Texto "a") (Edicion reverse (Texto "abc")))
                (Reenvio "Zoe" (Texto "b"))
 m4 = Respuesta Eliminado (Respuesta (Texto "x") Eliminado)
 
--- función ya dada (no hay que implementarla; se usa en limpiar y en la reescritura)
+-- función ya dada
 responder :: Mensaje -> Mensaje -> Mensaje
 responder Eliminado r = r              -- responder.1
 responder o Eliminado = o              -- responder.2
@@ -79,7 +79,6 @@ primeraLinea = undefined
 
 5. `citas`, que junta, para cada `Respuesta o r` que aparece en el mensaje (a cualquier profundidad), las líneas que muestra el original `o` (como las mostraría `leer o`), siguiendo el orden: primero las del original de esa respuesta, luego las citas dentro de `o`, luego las citas dentro de `r`.
    - `citas m1 = ["hola"]`, `citas m2 = []`, `citas m3 = ["a","cba","a"]`, `citas m4 = ["x"]`
-   - **ATENCIÓN**: esta función usa el subárbol `o` completo además de su resultado recursivo.
 
 ```haskell
 citas :: Mensaje -> [String]
@@ -88,7 +87,6 @@ citas = undefined
 
 6. `limpiar`, que elimina los `Eliminado` que sean un operando directo de una `Respuesta` (si uno de los dos lados de una respuesta es `Eliminado` queda solo el otro). No modifica nada más.
    - `limpiar m4` es `Texto "x"`; `limpiar m1` es estructuralmente igual a `m1`.
-   - AYUDA: usar `responder` (ya dada en la base) para armar la respuesta de dos mensajes ya limpios.
 
 ```haskell
 limpiar :: Mensaje -> Mensaje
@@ -109,7 +107,7 @@ recMensaje = undefined
 
 ## Ejercicio 3 - Reescritura
 
-Redefinir las seis funciones del Ejercicio 1 sin recursión explícita, usando `foldMensaje`, `recMensaje` y funciones ya definidas (`responder`, `map`, `fmap`, `(++)`, etc.). Usar `recMensaje` solo donde haga falta.
+Redefinir las seis funciones del Ejercicio 1 sin recursión explícita, usando `foldMensaje`, `recMensaje` y funciones ya definidas.
 
 ```haskell
 cantidadLineas' :: Mensaje -> Int
@@ -145,7 +143,7 @@ Por inducción estructural, con casos, HI/TI, extensionalidad cuando corresponda
 -- LEN-MAP: length (map f xs) = length xs
 ```
 
-**4b)** Enunciar y demostrar el lema auxiliar que necesite sobre `responder` (se prueba por análisis de casos). **AYUDA**: desarrollar únicamente los casos `Reenvio` y `Respuesta` (los demás se dejan indicados).
+**4b)**
 
 ```
 -- 4b) por inducción estructural sobre Mensaje

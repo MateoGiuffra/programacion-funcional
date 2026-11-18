@@ -28,6 +28,10 @@ Bloques (orden variable; la demo a veces va 2do, a veces último):
 
 Encabezado fijo (opcional pero típico): "Programación Funcional - Parcial - <Tema> - <cuatrimestre>", y aclaraciones: libro abierto, se pueden usar funciones/propiedades vistas en clase citando la referencia, lo demás se define o demuestra.
 
+## 2b. REGLA DURA: sin ayudas (preferencia del usuario)
+
+El usuario quiere DESCUBRIR por sí mismo qué auxiliar, función dada, lema o caso usar. En los enunciados generados NO poner: AYUDA/ATENCIÓN/pista/sugerencia, "usar `f` (ya dada)" en un punto concreto, "el fold puede devolver una función", "no sale por recursión estructural pura", "se prueba por análisis de casos", "desarrollar solo los casos X e Y", nombres de lemas a usar, ni cuántos lemas hacen falta. Lo máximo permitido, como en los parciales reales: el TIPO de una función/auxiliar pedida (`f :: ...`), las funciones ya dadas en el bloque base sin decir dónde usarlas, y los lemas de listas estándar (`LEN-APP`, `APP-NIL`) enunciados como "se pueden usar sin demostrar" sin decir dónde. Las tablas de niveles que mencionen "AYUDA" se refieren a dificultad, no a texto: ignorarlas.
+
 ## 3. Restricciones duras del ADT
 
 - PROHIBIDO un constructor con campo `[T]` donde `T` es el propio tipo (nada de árboles generales/rose trees). Aridad recursiva **fija**: 1, 2 o 3 posiciones del propio tipo directamente (ThreeT 3, PrefixT 3, Spaceship/Calabozo/Animacion 2). Antes de fijar el ADT, revisarlo. Un tipo auxiliar con `[...]` solo puede aparecer como tipo de salida/isomorfismo, nunca como forma central.

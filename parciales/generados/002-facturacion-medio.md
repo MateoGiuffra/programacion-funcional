@@ -53,21 +53,16 @@ items = undefined
 
 4. `mayorPrecio`, que describe el mayor precio final de un ítem (el mismo que aparece en `items`), o 0 si no hay ítems. Suponer precios y factores no negativos.
    - `mayorPrecio c1 = 100`, `mayorPrecio c2 = 30`, `mayorPrecio c3 = 0`
-   - **ATENCIÓN**: no sale por recursión estructural pura. AYUDA: usar una auxiliar con un parámetro extra.
 
 ```haskell
 mayorPrecio :: Cuenta -> Int
 mayorPrecio = undefined
-
-mayorPrecioCon :: Int -> Cuenta -> Int   -- ayuda: auxiliar con parámetro extra
-mayorPrecioCon = undefined
 ```
 
 5. `simp`, que quita todos los `Nada` que sean un operando directo de un `Junto` (no toca el resto de la estructura: un `Escala k Nada` queda igual).
    - `simp c1 = Junto (Item 100) (Escala 2 (Item 30))`
    - `simp c3 = Escala 4 Nada`
    - `simp (Junto Nada (Item 3)) = Item 3`
-   - AYUDA: `juntar` (ya dada en la base) arma el `Junto` de dos cuentas ya simplificadas, salvo que alguna sea `Nada`; se puede usar directamente (en el ejercicio de reescritura también).
 
 ```haskell
 simp :: Cuenta -> Cuenta
@@ -84,7 +79,7 @@ foldCuenta = undefined
 
 ## Ejercicio 3 - Reescritura
 
-Redefinir las cinco funciones del Ejercicio 1 usando solamente `foldCuenta` (y `juntar`). AYUDA para `mayorPrecio'`: el fold puede devolver una función.
+Redefinir las cinco funciones del Ejercicio 1 sin recursión explícita, usando `foldCuenta` y funciones ya definidas.
 
 ```haskell
 eval' :: Cuenta -> Int
@@ -107,7 +102,7 @@ simp' = undefined
 
 Por inducción estructural, con extensionalidad cuando corresponda, casos, HI/TI y justificando cada paso.
 
-**4a)** Se pide enunciar y demostrar los lemas auxiliares que necesite (pista: uno, sobre `juntar`; se prueba por análisis de casos, sin inducción).
+**4a)** Se pide enunciar y demostrar los lemas auxiliares que necesite.
 
 ```
 -- 4a) por inducción estructural sobre Cuenta
