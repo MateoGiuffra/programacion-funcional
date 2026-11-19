@@ -8,17 +8,17 @@ Libro abierto. Se pueden usar propiedades vistas en clase citando su origen; lo 
 data Lista = Vacia | Cons Int Lista
   deriving (Show, Eq)
 
-f :: Lista -> Int
-f Vacia       = 0            -- f.1
-f (Cons x xs) = 1 + f xs     -- f.2
+cantidad :: Lista -> Int
+cantidad Vacia       = 0            -- cantidad.1
+cantidad (Cons x xs) = 1 + cantidad xs     -- cantidad.2
 
-g :: Int -> Lista -> Lista
-g y Vacia       = Vacia                                        -- g.1
-g y (Cons x xs) = if x > y then Cons x (g y xs) else g y xs    -- g.2
+mayores :: Int -> Lista -> Lista
+mayores y Vacia       = Vacia                                        -- mayores.1
+mayores y (Cons x xs) = if x > y then Cons x (mayores y xs) else mayores y xs    -- mayores.2
 
-h :: Int -> Lista -> Lista
-h y Vacia       = Vacia                                        -- h.1
-h y (Cons x xs) = if x > y then h y xs else Cons x (h y xs)    -- h.2
+noMayores :: Int -> Lista -> Lista
+noMayores y Vacia       = Vacia                                        -- noMayores.1
+noMayores y (Cons x xs) = if x > y then noMayores y xs else Cons x (noMayores y xs)    -- noMayores.2
 
 ej1, ej2, ej3 :: Lista
 ej1 = Cons 5 (Cons 1 (Cons 8 (Cons 3 Vacia)))
@@ -26,17 +26,17 @@ ej2 = Cons 2 (Cons 2 Vacia)
 ej3 = Vacia
 ```
 
-- `f` describe la cantidad de elementos.
-- `g y xs` describe la lista que queda de `xs` al quedarse con los elementos mayores que `y`, en el mismo orden.
-- `h y xs` describe la lista que queda de `xs` al quedarse con los elementos que **no** son mayores que `y`, en el mismo orden.
-- `g 3 ej1 = Cons 5 (Cons 8 Vacia)` y `h 3 ej1 = Cons 1 (Cons 3 Vacia)`
+- `cantidad` describe la cantidad de elementos.
+- `mayores y xs` describe la lista que queda de `xs` al quedarse con los elementos mayores que `y`, en el mismo orden.
+- `noMayores y xs` describe la lista que queda de `xs` al quedarse con los elementos que **no** son mayores que `y`, en el mismo orden.
+- `mayores 3 ej1 = Cons 5 (Cons 8 Vacia)` y `noMayores 3 ej1 = Cons 1 (Cons 3 Vacia)`
 
 ## Demostración 1
 
 Por inducción estructural, con casos, HI/TI y justificando cada paso.
 
 ```
-¿ para todo y, xs. f (g y xs) + f (h y xs) = f xs ?
+¿ para todo y, xs. cantidad (mayores y xs) + cantidad (noMayores y xs) = cantidad xs ?
 ```
 
 Plantilla (completar):
@@ -58,7 +58,7 @@ DEMO:
 Por extensionalidad e inducción estructural, con casos, HI/TI y justificando cada paso.
 
 ```
-¿ para todo y. (g y . g y) = g y ?
+¿ para todo y. (mayores y . mayores y) = mayores y ?
 ```
 
 Plantilla (completar):
@@ -84,7 +84,7 @@ DEMO:
 Misma consigna que la Demostración 2.
 
 ```
-¿ para todo y, z. (g y . g z) = (g z . g y) ?
+¿ para todo y, z. (mayores y . mayores z) = (mayores z . mayores y) ?
 ```
 
 ## Pruebas
@@ -94,10 +94,10 @@ Para chequear la base y comprobar sobre ejemplos que las propiedades valen. Se e
 ```haskell
 main :: IO ()
 main = do
-  print (g 3 ej1)   -- Cons 5 (Cons 8 Vacia)
-  print (h 3 ej1)   -- Cons 1 (Cons 3 Vacia)
-  print (g 9 ej1)   -- Vacia
-  print (and [ f (g y xs) + f (h y xs) == f xs | y <- [0 .. 9], xs <- [ej1, ej2, ej3] ])               -- True
-  print (and [ (g y . g y) xs == g y xs | y <- [0 .. 9], xs <- [ej1, ej2, ej3] ])                        -- True
-  print (and [ (g y . g z) xs == (g z . g y) xs | y <- [0 .. 9], z <- [0 .. 9], xs <- [ej1, ej2, ej3] ]) -- True
+  print (mayores 3 ej1)   -- Cons 5 (Cons 8 Vacia)
+  print (noMayores 3 ej1)   -- Cons 1 (Cons 3 Vacia)
+  print (mayores 9 ej1)   -- Vacia
+  print (and [ cantidad (mayores y xs) + cantidad (noMayores y xs) == cantidad xs | y <- [0 .. 9], xs <- [ej1, ej2, ej3] ])               -- True
+  print (and [ (mayores y . mayores y) xs == mayores y xs | y <- [0 .. 9], xs <- [ej1, ej2, ej3] ])                        -- True
+  print (and [ (mayores y . mayores z) xs == (mayores z . mayores y) xs | y <- [0 .. 9], z <- [0 .. 9], xs <- [ej1, ej2, ej3] ]) -- True
 ```

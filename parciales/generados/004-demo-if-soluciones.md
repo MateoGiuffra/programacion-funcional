@@ -2,114 +2,114 @@
 
 Verificado con GHC: la base compila y las tres propiedades valen sobre los ejemplos. Los pasos de abajo los armé a mano con las ecuaciones de la base. No abrir antes de intentar.
 
-## Demostración 1: `¿ para todo y, xs. f (g y xs) + f (h y xs) = f xs ?`
+## Demostración 1: `¿ para todo y, xs. cantidad (mayores y xs) + cantidad (noMayores y xs) = cantidad xs ?`
 
 Inducción estructural sobre `xs` (`y` queda como está). El `if` obliga a abrir dos casos sobre `x > y`.
 
 ```
 casoBase) xs = Vacia
-    ¿ f (g y Vacia) + f (h y Vacia) = f Vacia ?
+    ¿ cantidad (mayores y Vacia) + cantidad (noMayores y Vacia) = cantidad Vacia ?
 
 casoInductivo) siendo x un Int cualquiera y xs una Lista cualquiera.
-    HI) ¡ f (g y xs) + f (h y xs) = f xs !
-    TI) ¿ f (g y (Cons x xs)) + f (h y (Cons x xs)) = f (Cons x xs) ?
+    HI) ¡ cantidad (mayores y xs) + cantidad (noMayores y xs) = cantidad xs !
+    TI) ¿ cantidad (mayores y (Cons x xs)) + cantidad (noMayores y (Cons x xs)) = cantidad (Cons x xs) ?
 
 DEMO:
 
 casoBase)
 LI)
-    f (g y Vacia) + f (h y Vacia)
-=                                       -- g.1
-    f Vacia + f (h y Vacia)
-=                                       -- h.1
-    f Vacia + f Vacia
-=                                       -- f.1
+    cantidad (mayores y Vacia) + cantidad (noMayores y Vacia)
+=                                       -- mayores.1
+    cantidad Vacia + cantidad (noMayores y Vacia)
+=                                       -- noMayores.1
+    cantidad Vacia + cantidad Vacia
+=                                       -- cantidad.1
     0 + 0
 =                                       -- aritm.
     0
 LD)
-    f Vacia
-=                                       -- f.1
+    cantidad Vacia
+=                                       -- cantidad.1
     0
 Vale para este caso.
 
 casoInductivo)
 LD)
-    f (Cons x xs)
-=                                       -- f.2
-    1 + f xs
+    cantidad (Cons x xs)
+=                                       -- cantidad.2
+    1 + cantidad xs
 
 LI)
-    f (g y (Cons x xs)) + f (h y (Cons x xs))
-=                                       -- g.2
-    f (if x > y then Cons x (g y xs) else g y xs) + f (h y (Cons x xs))
-=                                       -- h.2
-    f (if x > y then Cons x (g y xs) else g y xs) + f (if x > y then h y xs else Cons x (h y xs))
+    cantidad (mayores y (Cons x xs)) + cantidad (noMayores y (Cons x xs))
+=                                       -- mayores.2
+    cantidad (if x > y then Cons x (mayores y xs) else mayores y xs) + cantidad (noMayores y (Cons x xs))
+=                                       -- noMayores.2
+    cantidad (if x > y then Cons x (mayores y xs) else mayores y xs) + cantidad (if x > y then noMayores y xs else Cons x (noMayores y xs))
 
 por analisis de casos sobre x > y
 
 caso1) x > y = True
-    f (if x > y then Cons x (g y xs) else g y xs) + f (if x > y then h y xs else Cons x (h y xs))
+    cantidad (if x > y then Cons x (mayores y xs) else mayores y xs) + cantidad (if x > y then noMayores y xs else Cons x (noMayores y xs))
 =                                       -- def. if, ya que x > y = True
-    f (Cons x (g y xs)) + f (h y xs)
-=                                       -- f.2
-    (1 + f (g y xs)) + f (h y xs)
+    cantidad (Cons x (mayores y xs)) + cantidad (noMayores y xs)
+=                                       -- cantidad.2
+    (1 + cantidad (mayores y xs)) + cantidad (noMayores y xs)
 =                                       -- aritm. (asociatividad de +)
-    1 + (f (g y xs) + f (h y xs))
+    1 + (cantidad (mayores y xs) + cantidad (noMayores y xs))
 =                                       -- HI
-    1 + f xs
+    1 + cantidad xs
     que es el LD.
     Vale para este caso.
 
 caso2) x > y = False
-    f (if x > y then Cons x (g y xs) else g y xs) + f (if x > y then h y xs else Cons x (h y xs))
+    cantidad (if x > y then Cons x (mayores y xs) else mayores y xs) + cantidad (if x > y then noMayores y xs else Cons x (noMayores y xs))
 =                                       -- def. if, ya que x > y = False
-    f (g y xs) + f (Cons x (h y xs))
-=                                       -- f.2
-    f (g y xs) + (1 + f (h y xs))
+    cantidad (mayores y xs) + cantidad (Cons x (noMayores y xs))
+=                                       -- cantidad.2
+    cantidad (mayores y xs) + (1 + cantidad (noMayores y xs))
 =                                       -- aritm. (conmutatividad y asociatividad de +)
-    1 + (f (g y xs) + f (h y xs))
+    1 + (cantidad (mayores y xs) + cantidad (noMayores y xs))
 =                                       -- HI
-    1 + f xs
+    1 + cantidad xs
     que es el LD.
     Vale para este caso.
 
 La propiedad vale.
 ```
 
-## Demostración 2: `¿ para todo y. (g y . g y) = g y ?`
+## Demostración 2: `¿ para todo y. (mayores y . mayores y) = mayores y ?`
 
-Extensionalidad sobre la lista; luego inducción sobre `xs`. Acá **la misma condición `x > y` aparece dos veces** (una por cada `g`): fijado su valor en el primer `if`, el segundo se resuelve con ese mismo valor.
+Extensionalidad sobre la lista; luego inducción sobre `xs`. Acá **la misma condición `x > y` aparece dos veces** (una por cada `mayores`): fijado su valor en el primer `if`, el segundo se resuelve con ese mismo valor.
 
 ```
 Sea y un Int cualquiera.
 
 Por principio de extensionalidad, siendo xs una Lista cualquiera, quiero ver que:
-    ¿ (g y . g y) xs = g y xs ?
+    ¿ (mayores y . mayores y) xs = mayores y xs ?
 por def. de compose, es equivalente decir:
-    ¿ g y (g y xs) = g y xs ?
+    ¿ mayores y (mayores y xs) = mayores y xs ?
 
 por principio de induccion estructural sobre la estructura de xs
 
 casoBase) xs = Vacia
-    ¿ g y (g y Vacia) = g y Vacia ?
+    ¿ mayores y (mayores y Vacia) = mayores y Vacia ?
 
 casoInductivo) siendo x un Int cualquiera y xs una Lista cualquiera.
-    HI) ¡ g y (g y xs) = g y xs !
-    TI) ¿ g y (g y (Cons x xs)) = g y (Cons x xs) ?
+    HI) ¡ mayores y (mayores y xs) = mayores y xs !
+    TI) ¿ mayores y (mayores y (Cons x xs)) = mayores y (Cons x xs) ?
 
 DEMO:
 
 casoBase)
 LI)
-    g y (g y Vacia)
-=                                       -- g.1
-    g y Vacia
-=                                       -- g.1
+    mayores y (mayores y Vacia)
+=                                       -- mayores.1
+    mayores y Vacia
+=                                       -- mayores.1
     Vacia
 LD)
-    g y Vacia
-=                                       -- g.1
+    mayores y Vacia
+=                                       -- mayores.1
     Vacia
 Vale para este caso.
 
@@ -119,46 +119,46 @@ por analisis de casos sobre x > y
 
 caso1) x > y = True
 LI)
-    g y (g y (Cons x xs))
-=                                       -- g.2 (el de adentro)
-    g y (if x > y then Cons x (g y xs) else g y xs)
+    mayores y (mayores y (Cons x xs))
+=                                       -- mayores.2 (el de adentro)
+    mayores y (if x > y then Cons x (mayores y xs) else mayores y xs)
 =                                       -- def. if, ya que x > y = True
-    g y (Cons x (g y xs))
-=                                       -- g.2
-    if x > y then Cons x (g y (g y xs)) else g y (g y xs)
+    mayores y (Cons x (mayores y xs))
+=                                       -- mayores.2
+    if x > y then Cons x (mayores y (mayores y xs)) else mayores y (mayores y xs)
 =                                       -- def. if, ya que x > y = True
-    Cons x (g y (g y xs))
+    Cons x (mayores y (mayores y xs))
 =                                       -- HI
-    Cons x (g y xs)
+    Cons x (mayores y xs)
 LD)
-    g y (Cons x xs)
-=                                       -- g.2
-    if x > y then Cons x (g y xs) else g y xs
+    mayores y (Cons x xs)
+=                                       -- mayores.2
+    if x > y then Cons x (mayores y xs) else mayores y xs
 =                                       -- def. if, ya que x > y = True
-    Cons x (g y xs)
+    Cons x (mayores y xs)
 Vale para este caso.
 
 caso2) x > y = False
 LI)
-    g y (g y (Cons x xs))
-=                                       -- g.2 (el de adentro)
-    g y (if x > y then Cons x (g y xs) else g y xs)
+    mayores y (mayores y (Cons x xs))
+=                                       -- mayores.2 (el de adentro)
+    mayores y (if x > y then Cons x (mayores y xs) else mayores y xs)
 =                                       -- def. if, ya que x > y = False
-    g y (g y xs)
+    mayores y (mayores y xs)
 =                                       -- HI
-    g y xs
+    mayores y xs
 LD)
-    g y (Cons x xs)
-=                                       -- g.2
-    if x > y then Cons x (g y xs) else g y xs
+    mayores y (Cons x xs)
+=                                       -- mayores.2
+    if x > y then Cons x (mayores y xs) else mayores y xs
 =                                       -- def. if, ya que x > y = False
-    g y xs
+    mayores y xs
 Vale para este caso.
 
 La propiedad vale.
 ```
 
-## Demostración 3: `¿ para todo y, z. (g y . g z) = (g z . g y) ?`
+## Demostración 3: `¿ para todo y, z. (mayores y . mayores z) = (mayores z . mayores y) ?`
 
 Igual que la 2, pero **las condiciones son distintas** (`x > y` y `x > z`): no hay atajo, se abren los 4 casos combinados.
 
@@ -166,33 +166,33 @@ Igual que la 2, pero **las condiciones son distintas** (`x > y` y `x > z`): no h
 Sean y y z Int cualesquiera.
 
 Por principio de extensionalidad, siendo xs una Lista cualquiera, quiero ver que:
-    ¿ (g y . g z) xs = (g z . g y) xs ?
+    ¿ (mayores y . mayores z) xs = (mayores z . mayores y) xs ?
 por def. de compose, es equivalente decir:
-    ¿ g y (g z xs) = g z (g y xs) ?
+    ¿ mayores y (mayores z xs) = mayores z (mayores y xs) ?
 
 por principio de induccion estructural sobre la estructura de xs
 
 casoBase) xs = Vacia
-    ¿ g y (g z Vacia) = g z (g y Vacia) ?
+    ¿ mayores y (mayores z Vacia) = mayores z (mayores y Vacia) ?
 
 casoInductivo) siendo x un Int cualquiera y xs una Lista cualquiera.
-    HI) ¡ g y (g z xs) = g z (g y xs) !
-    TI) ¿ g y (g z (Cons x xs)) = g z (g y (Cons x xs)) ?
+    HI) ¡ mayores y (mayores z xs) = mayores z (mayores y xs) !
+    TI) ¿ mayores y (mayores z (Cons x xs)) = mayores z (mayores y (Cons x xs)) ?
 
 DEMO:
 
 casoBase)
 LI)
-    g y (g z Vacia)
-=                                       -- g.1
-    g y Vacia
-=                                       -- g.1
+    mayores y (mayores z Vacia)
+=                                       -- mayores.1
+    mayores y Vacia
+=                                       -- mayores.1
     Vacia
 LD)
-    g z (g y Vacia)
-=                                       -- g.1
-    g z Vacia
-=                                       -- g.1
+    mayores z (mayores y Vacia)
+=                                       -- mayores.1
+    mayores z Vacia
+=                                       -- mayores.1
     Vacia
 Vale para este caso.
 
@@ -202,58 +202,58 @@ por analisis de casos sobre x > y, x > z
 
 caso1) x > y = True, x > z = True
 LI)
-    g y (g z (Cons x xs))
-=                                       -- g.2 (el de adentro), def. if, ya que x > z = True
-    g y (Cons x (g z xs))
-=                                       -- g.2, def. if, ya que x > y = True
-    Cons x (g y (g z xs))
+    mayores y (mayores z (Cons x xs))
+=                                       -- mayores.2 (el de adentro), def. if, ya que x > z = True
+    mayores y (Cons x (mayores z xs))
+=                                       -- mayores.2, def. if, ya que x > y = True
+    Cons x (mayores y (mayores z xs))
 =                                       -- HI
-    Cons x (g z (g y xs))
+    Cons x (mayores z (mayores y xs))
 LD)
-    g z (g y (Cons x xs))
-=                                       -- g.2 (el de adentro), def. if, ya que x > y = True
-    g z (Cons x (g y xs))
-=                                       -- g.2, def. if, ya que x > z = True
-    Cons x (g z (g y xs))
+    mayores z (mayores y (Cons x xs))
+=                                       -- mayores.2 (el de adentro), def. if, ya que x > y = True
+    mayores z (Cons x (mayores y xs))
+=                                       -- mayores.2, def. if, ya que x > z = True
+    Cons x (mayores z (mayores y xs))
 Vale para este caso.
 
 caso2) x > y = True, x > z = False
 LI)
-    g y (g z (Cons x xs))
-=                                       -- g.2 (el de adentro), def. if, ya que x > z = False
-    g y (g z xs)
+    mayores y (mayores z (Cons x xs))
+=                                       -- mayores.2 (el de adentro), def. if, ya que x > z = False
+    mayores y (mayores z xs)
 LD)
-    g z (g y (Cons x xs))
-=                                       -- g.2 (el de adentro), def. if, ya que x > y = True
-    g z (Cons x (g y xs))
-=                                       -- g.2, def. if, ya que x > z = False
-    g z (g y xs)
-LI y LD: g y (g z xs) y g z (g y xs), iguales por HI.
+    mayores z (mayores y (Cons x xs))
+=                                       -- mayores.2 (el de adentro), def. if, ya que x > y = True
+    mayores z (Cons x (mayores y xs))
+=                                       -- mayores.2, def. if, ya que x > z = False
+    mayores z (mayores y xs)
+LI y LD: mayores y (mayores z xs) y mayores z (mayores y xs), iguales por HI.
 Vale para este caso.
 
 caso3) x > y = False, x > z = True
 LI)
-    g y (g z (Cons x xs))
-=                                       -- g.2 (el de adentro), def. if, ya que x > z = True
-    g y (Cons x (g z xs))
-=                                       -- g.2, def. if, ya que x > y = False
-    g y (g z xs)
+    mayores y (mayores z (Cons x xs))
+=                                       -- mayores.2 (el de adentro), def. if, ya que x > z = True
+    mayores y (Cons x (mayores z xs))
+=                                       -- mayores.2, def. if, ya que x > y = False
+    mayores y (mayores z xs)
 LD)
-    g z (g y (Cons x xs))
-=                                       -- g.2 (el de adentro), def. if, ya que x > y = False
-    g z (g y xs)
-LI y LD: g y (g z xs) y g z (g y xs), iguales por HI.
+    mayores z (mayores y (Cons x xs))
+=                                       -- mayores.2 (el de adentro), def. if, ya que x > y = False
+    mayores z (mayores y xs)
+LI y LD: mayores y (mayores z xs) y mayores z (mayores y xs), iguales por HI.
 Vale para este caso.
 
 caso4) x > y = False, x > z = False
 LI)
-    g y (g z (Cons x xs))
-=                                       -- g.2 (el de adentro), def. if, ya que x > z = False
-    g y (g z xs)
+    mayores y (mayores z (Cons x xs))
+=                                       -- mayores.2 (el de adentro), def. if, ya que x > z = False
+    mayores y (mayores z xs)
 LD)
-    g z (g y (Cons x xs))
-=                                       -- g.2 (el de adentro), def. if, ya que x > y = False
-    g z (g y xs)
+    mayores z (mayores y (Cons x xs))
+=                                       -- mayores.2 (el de adentro), def. if, ya que x > y = False
+    mayores z (mayores y xs)
 LI y LD: iguales por HI.
 Vale para este caso.
 
