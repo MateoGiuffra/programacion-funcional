@@ -362,6 +362,84 @@ Verificadas con `runghc`.
 
 Imports: `Data.Maybe` (`fromMaybe`, `isJust`, `isNothing`, `fromJust`, `catMaybes`, `mapMaybe`, `listToMaybe`, `maybeToList`), `Data.List` (`find`), `Control.Applicative` (`<|>`). `maybe`, `either` y `lookup` vienen en el Prelude.
 
+### Cómo se definen (por si no te acordás)
+
+Verificadas con GHC. Las del Prelude se usan sin definir; esto es para entender qué hacen.
+
+```haskell
+-- listas
+map f []     = []                                              -- map.1
+map f (x:xs) = f x : map f xs                                  -- map.2
+filter p []     = []                                           -- filter.1
+filter p (x:xs) = if p x then x : filter p xs else filter p xs -- filter.2
+foldr f z []     = z                                           -- foldr.1
+foldr f z (x:xs) = f x (foldr f z xs)                          -- foldr.2
+length []     = 0                                              -- length.1
+length (_:xs) = 1 + length xs                                  -- length.2
+sum []     = 0                                                 -- sum.1
+sum (x:xs) = x + sum xs                                        -- sum.2
+elem x []     = False                                          -- elem.1
+elem x (y:ys) = x == y || elem x ys                            -- elem.2
+[]     ++ ys = ys                                              -- (++).1
+(x:xs) ++ ys = x : (xs ++ ys)                                  -- (++).2
+concat []       = []                                           -- concat.1
+concat (xs:xss) = xs ++ concat xss                             -- concat.2
+any p []     = False                                           -- any.1
+any p (x:xs) = p x || any p xs                                 -- any.2
+all p []     = True                                            -- all.1
+all p (x:xs) = p x && all p xs                                 -- all.2
+zip []     _      = []                                         -- zip.1
+zip _      []     = []                                         -- zip.2
+zip (x:xs) (y:ys) = (x,y) : zip xs ys                          -- zip.3
+zipWith f []     _      = []                                   -- zipWith.1
+zipWith f _      []     = []                                   -- zipWith.2
+zipWith f (x:xs) (y:ys) = f x y : zipWith f xs ys              -- zipWith.3
+lookup k []         = Nothing                                  -- lookup.1
+lookup k ((a,b):ps) = if k == a then Just b else lookup k ps   -- lookup.2
+find p []     = Nothing                                        -- find.1
+find p (x:xs) = if p x then Just x else find p xs              -- find.2
+
+-- combinadores
+(f . g) x      = f (g x)                                       -- (.).1
+flip f x y     = f y x                                         -- flip.1
+const x _      = x                                             -- const.1
+id x           = x                                             -- id.1
+curry f x y    = f (x, y)                                      -- curry.1
+uncurry f (x,y) = f x y                                        -- uncurry.1
+subtract n y   = y - n                                         -- subtract.1
+
+-- Maybe / Either
+maybe d f Nothing  = d                                         -- maybe.1
+maybe d f (Just x) = f x                                       -- maybe.2
+either f g (Left x)  = f x                                     -- either.1
+either f g (Right y) = g y                                     -- either.2
+fromMaybe d Nothing  = d                                       -- fromMaybe.1
+fromMaybe d (Just x) = x                                       -- fromMaybe.2
+isJust Nothing  = False                                        -- isJust.1
+isJust (Just _) = True                                         -- isJust.2
+isNothing Nothing  = True                                      -- isNothing.1
+isNothing (Just _) = False                                     -- isNothing.2
+catMaybes []             = []                                  -- catMaybes.1
+catMaybes (Nothing : ms) = catMaybes ms                        -- catMaybes.2
+catMaybes (Just x  : ms) = x : catMaybes ms                    -- catMaybes.3
+mapMaybe f []     = []                                         -- mapMaybe.1
+mapMaybe f (x:xs) = case f x of                                -- mapMaybe.2
+                      Nothing -> mapMaybe f xs
+                      Just y  -> y : mapMaybe f xs
+listToMaybe []    = Nothing                                    -- listToMaybe.1
+listToMaybe (x:_) = Just x                                     -- listToMaybe.2
+maybeToList Nothing  = []                                      -- maybeToList.1
+maybeToList (Just x) = [x]                                     -- maybeToList.2
+
+-- fmap, (>>=) y (<|>) sobre Maybe
+fmap f Nothing  = Nothing                                      -- fmap.1
+fmap f (Just x) = Just (f x)                                   -- fmap.2
+Nothing  >>= f = Nothing                                       -- (>>=).1
+(Just x) >>= f = f x                                           -- (>>=).2
+Nothing <|> r = r                                              -- (<|>).1
+l       <|> _ = l                                              -- (<|>).2
+```
+
 ### Auxiliares sobre Maybe (no son del Prelude: se definen)
 
 Útiles cuando un fold devuelve `Maybe` en cada rama y hay que juntar resultados (ej. `Confluencia`/`Switch`).
