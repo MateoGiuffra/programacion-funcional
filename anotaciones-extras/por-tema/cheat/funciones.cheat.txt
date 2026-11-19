@@ -1,0 +1,697 @@
+# 1. FUNCIONES ÚTILES |flow
+## compose
+-- Composición: primero aplica g y después f. Es el operador (.): (f . g) x = f (g x).
+[C]
+compose :: (b -> c) -> (a -> b) -> a -> c
+compose ;; f ;; g ;; x ;; = f (g x)
+## const
+-- Ignora el segundo argumento y devuelve siempre el primero.
+[C]
+const :: a -> b -> a
+const ;; x ;; _ ;; = x
+## curry
+-- Convierte una función que recibe un par en una que recibe los argumentos de a uno.
+[C]
+curry :: ((a, b) -> c) -> a -> b -> c
+curry ;; f ;; x ;; y ;; = f (x, y)
+## uncurry
+-- Convierte una función currificada en una que recibe un par.
+[C]
+uncurry :: (a -> b -> c) -> (a, b) -> c
+uncurry ;; f ;; (x, y) ;; = f x y
+## flip
+-- Invierte el orden de los dos argumentos de f.
+[C]
+flip :: (a -> b -> c) -> b -> a -> c
+flip ;; f ;; x ;; y ;; = f y x
+## uflip
+-- flip para funciones que reciben un par: invierte las componentes antes de aplicar f.
+[C]
+uflip :: ((b, a) -> c) -> (a, b) -> c
+uflip ;; f ;; (x, y) ;; = f (y, x)
+## id
+-- Identidad: devuelve el mismo argumento.
+[C]
+id :: a -> a
+id ;; x ;; = x
+## null
+-- Indica si la lista es vacía (tiempo constante: usar `null` y no `length xs == 0`).
+[C]
+null :: [a] -> Bool
+null ;; [] ;; = True
+null ;; _ ;; = False
+## subtract
+-- Resta el PRIMER argumento al segundo: `subtract 1 = \y -> y - 1`. Existe porque `(-1)` no es una sección, es el número -1.
+[C]
+subtract :: Num a => a -> a -> a
+subtract ;; x ;; y ;; = y - x
+## twice
+-- Aplica f dos veces.
+[C]
+twice :: (a -> a) -> a -> a
+twice ;; f ;; x ;; = f (f x)
+## many
+-- Aplica f n veces (recursión sobre el número; n >= 0).
+[C]
+many :: Int -> (a -> a) -> a -> a
+many ;; n ;; f ;; x ;; = if n == 0 then x else f (many (n - 1) f x)
+## subst
+-- Aplica f a x y al resultado de g x.
+[C]
+subst :: (a -> b -> c) -> (a -> b) -> a -> c
+subst ;; f ;; g ;; x ;; = f x (g x)
+
+# 2. ESQUEMAS SOBRE LISTAS
+## map
+-- Transforma cada elemento de la lista con f.
+[E]
+map :: (a -> b) -> [a] -> [b]
+map ;; f ;; [] ;; = []
+map ;; f ;; (x:xs) ;; = f x : map f xs
+[S]
+map' :: (a -> b) -> [a] -> [b]
+map' f = foldr (\x r -> f x : r) []
+## filter
+-- Se queda solo con los elementos que cumplen p.
+[E]
+filter :: (a -> Bool) -> [a] -> [a]
+filter ;; p ;; [] ;; = []
+filter ;; p ;; (x:xs) ;; = if p x
+@@    then x : filter p xs
+@@    else filter p xs
+[S]
+filter' :: (a -> Bool) -> [a] -> [a]
+filter' p = foldr (\x r -> if p x then x : r else r) []
+## foldr (recursión estructural)
+-- Reemplaza cada `(:)` por f y la lista vacía por z: `foldr f z [x1, x2, x3] = f x1 (f x2 (f x3 z))`.
+[C]
+foldr :: (a -> b -> b) -> b -> [a] -> b
+foldr ;; f ;; z ;; [] ;; = z
+foldr ;; f ;; z ;; (y:ys) ;; = f y (foldr f z ys)
+## recr (recursión primitiva)
+-- Como foldr, pero la función recibe además la COLA original (sirve cuando hay que mirar el resto de la lista sin procesar).
+[C]
+recr :: b -> (a -> [a] -> b -> b) -> [a] -> b
+recr ;; z ;; g ;; [] ;; = z
+recr ;; z ;; g ;; (y:ys) ;; = g y ys (recr z g ys)
+## foldr1
+-- foldr para listas NO vacías: el último elemento hace de caso base.
+[E]
+foldr1 :: (a -> a -> a) -> [a] -> a
+foldr1 ;; f ;; [x] ;; = x
+foldr1 ;; f ;; (x:xs) ;; = f x (foldr1 f xs)
+[S]
+foldr1' :: (a -> a -> a) -> [a] -> a
+foldr1' f = recr (error "lista vacia")
+                 (\x xs r -> if null xs then x else f x r)
+## zip
+-- Arma pares con los elementos en la misma posición; corta en la lista más corta.
+[E]
+zip :: [a] -> [b] -> [(a, b)]
+zip ;; (x:xs) ;; (y:ys) ;; = (x, y) : zip xs ys
+zip ;; _ ;; _ ;; = []
+[S]
+zip' :: [a] -> [b] -> [(a, b)]
+zip' = zipWith' (,)       -- ver zipWith
+## zipWith (recorrido de 2 listas a la vez)
+-- Combina con f los elementos en la misma posición; corta en la más corta. Con esquema, el foldr devuelve una función que espera la 2da lista.
+[E]
+zipWith :: (a -> b -> c) -> [a] -> [b] -> [c]
+zipWith ;; f ;; (x:xs) ;; (y:ys) ;; = f x y : zipWith f xs ys
+zipWith ;; _ ;; _ ;; _ ;; = []
+[S]
+zipWith' :: (a -> b -> c) -> [a] -> [b] -> [c]
+zipWith' f = foldr g (\_ -> [])
+  where g ;; x ;; h ;; [] ;; = []
+        g ;; x ;; h ;; (y:ys) ;; = f x y : h ys
+## partition
+-- Separa la lista en (los que cumplen p, los que no).
+[E]
+partition :: (a -> Bool) -> [a] -> ([a], [a])
+partition ;; p ;; [] ;; = ([], [])
+partition ;; p ;; (x:xs) ;; = let (ys, zs) = partition p xs
+@@  in if p x
+@@       then (x : ys, zs)
+@@       else (ys, x : zs)
+[S]
+partition' :: (a -> Bool) -> [a] -> ([a], [a])
+partition' p = foldr (\x (ys, zs) ->
+                         if p x then (x : ys, zs) else (ys, x : zs))
+                     ([], [])
+## scanr
+-- Como foldr, pero devuelve la lista con todos los resultados parciales: `scanr (+) 0 [1,2,3] = [6,5,3,0]`.
+[E]
+scanr :: (a -> b -> b) -> b -> [a] -> [b]
+scanr ;; f ;; z ;; [] ;; = [z]
+scanr ;; f ;; z ;; (x:xs) ;; = let r = scanr f z xs
+@@  in f x (head r) : r
+[S]
+scanr' :: (a -> b -> b) -> b -> [a] -> [b]
+scanr' f z = foldr (\x r -> f x (head r) : r) [z]
+
+# 3. FUNCIONES DE LISTAS
+## length
+-- Cantidad de elementos.
+[E]
+length :: [a] -> Int
+length ;; [] ;; = 0
+length ;; (_:xs) ;; = 1 + length xs
+[S]
+length' :: [a] -> Int
+length' = foldr (\_ n -> 1 + n) 0
+## sum / product
+-- Suma / multiplica todos los elementos.
+[E]
+sum :: [Int] -> Int
+sum ;; [] ;; = 0
+sum ;; (x:xs) ;; = x + sum xs
+[S]
+sum' :: [Int] -> Int
+sum' = foldr (+) 0
+[E]
+product :: [Int] -> Int
+product ;; [] ;; = 1
+product ;; (x:xs) ;; = x * product xs
+[S]
+product' :: [Int] -> Int
+product' = foldr (*) 1
+## concat
+-- Junta (append) todas las listas de la lista.
+[E]
+concat :: [[a]] -> [a]
+concat ;; [] ;; = []
+concat ;; (xs:xss) ;; = xs ++ concat xss
+[S]
+concat' :: [[a]] -> [a]
+concat' = foldr (++) []
+## (++) / append
+-- Pone los elementos de la primera lista adelante de los de la segunda. Con esquema, la 2da lista es el caso base.
+[E]
+append :: [a] -> [a] -> [a]
+append ;; [] ;; ys ;; = ys
+append ;; (x:xs) ;; ys ;; = x : append xs ys
+[S]
+append' :: [a] -> [a] -> [a]
+append' xs ys = foldr (:) ys xs
+## reverse
+-- Da vuelta la lista.
+[E]
+reverse :: [a] -> [a]
+reverse ;; [] ;; = []
+reverse ;; (x:xs) ;; = reverse xs ++ [x]
+[S]
+reverse' :: [a] -> [a]
+reverse' = foldr (\x r -> r ++ [x]) []
+## elem
+-- Indica si x está en la lista. Con esquema, x es FIJO: queda afuera del foldr.
+[E]
+elem :: Eq a => a -> [a] -> Bool
+elem ;; x ;; [] ;; = False
+elem ;; x ;; (y:ys) ;; = x == y || elem x ys
+[S]
+elem' :: Eq a => a -> [a] -> Bool
+elem' x = foldr (\y b -> x == y || b) False
+## any / all
+-- any: si ALGUNO cumple p. all: si TODOS cumplen p.
+[E]
+any :: (a -> Bool) -> [a] -> Bool
+any ;; p ;; [] ;; = False
+any ;; p ;; (x:xs) ;; = p x || any p xs
+[S]
+any' :: (a -> Bool) -> [a] -> Bool
+any' p = foldr (\x b -> p x || b) False
+[E]
+all :: (a -> Bool) -> [a] -> Bool
+all ;; p ;; [] ;; = True
+all ;; p ;; (x:xs) ;; = p x && all p xs
+[S]
+all' :: (a -> Bool) -> [a] -> Bool
+all' p = foldr (\x b -> p x && b) True
+## countBy
+-- Cuántos elementos cumplen p.
+[E]
+countBy :: (a -> Bool) -> [a] -> Int
+countBy ;; p ;; [] ;; = 0
+countBy ;; p ;; (x:xs) ;; = if p x then 1 + countBy p xs else countBy p xs
+[S]
+countBy' :: (a -> Bool) -> [a] -> Int
+countBy' p = foldr (\x n -> if p x then 1 + n else n) 0
+## find
+-- El primer elemento que cumple p (Nothing si no hay).
+[E]
+find :: (a -> Bool) -> [a] -> Maybe a
+find ;; p ;; [] ;; = Nothing
+find ;; p ;; (x:xs) ;; = if p x then Just x else find p xs
+[S]
+find' :: (a -> Bool) -> [a] -> Maybe a
+find' p = foldr (\x r -> if p x then Just x else r) Nothing
+## lookup
+-- Busca el valor asociado a la clave k en una lista de pares (clave, valor).
+[E]
+lookup :: Eq k => k -> [(k, v)] -> Maybe v
+lookup ;; k ;; [] ;; = Nothing
+lookup ;; k ;; ((k', v):kvs) ;; = if k == k' then Just v else lookup k kvs
+[S]
+lookup' :: Eq k => k -> [(k, v)] -> Maybe v
+lookup' k = foldr (\(k', v) r -> if k == k' then Just v else r) Nothing
+## unzip
+-- Separa una lista de pares en el par de listas.
+[E]
+unzip :: [(a, b)] -> ([a], [b])
+unzip ;; [] ;; = ([], [])
+unzip ;; ((x, y):ps) ;; = let (xs, ys) = unzip ps
+@@  in (x : xs, y : ys)
+[S]
+unzip' :: [(a, b)] -> ([a], [b])
+unzip' = foldr (\(x, y) (xs, ys) -> (x : xs, y : ys)) ([], [])
+## takeWhile
+-- Toma elementos mientras cumplan p; corta en el primero que no.
+[E]
+takeWhile :: (a -> Bool) -> [a] -> [a]
+takeWhile ;; p ;; [] ;; = []
+takeWhile ;; p ;; (x:xs) ;; = if p x then x : takeWhile p xs else []
+[S]
+takeWhile' :: (a -> Bool) -> [a] -> [a]
+takeWhile' p = foldr (\x r -> if p x then x : r else []) []
+## take
+-- Los primeros n elementos (n >= 0). El n CAMBIA en la recursión, así que el foldr devuelve una función `Int -> [a]`.
+[E]
+take :: Int -> [a] -> [a]
+take ;; n ;; [] ;; = []
+take ;; n ;; (x:xs) ;; = if n == 0 then [] else x : take (n - 1) xs
+[S]
+take' :: Int -> [a] -> [a]
+take' n xs = foldr (\x h k -> if k == 0 then [] else x : h (k - 1))
+                   (\_ -> []) xs n
+## drop
+-- Saca los primeros n elementos (n >= 0). Necesita la cola original, por eso recr; devuelve una función `Int -> [a]`.
+[E]
+drop :: Int -> [a] -> [a]
+drop ;; n ;; [] ;; = []
+drop ;; n ;; (x:xs) ;; = if n == 0 then x : xs else drop (n - 1) xs
+[S]
+drop' :: Int -> [a] -> [a]
+drop' n xs = recr (\_ -> [])
+                  (\x t h k -> if k == 0 then x : t else h (k - 1)) xs n
+## elemAt (!!)
+-- El elemento en la posición n (empieza en 0; n >= 0).
+[E]
+elemAt :: Int -> [a] -> a
+elemAt ;; n ;; [] ;; = error "indice fuera de rango"
+elemAt ;; n ;; (x:xs) ;; = if n == 0 then x else elemAt (n - 1) xs
+[S]
+elemAt' :: Int -> [a] -> a
+elemAt' n xs = foldr (\x h k -> if k == 0 then x else h (k - 1))
+                     (\_ -> error "indice fuera de rango") xs n
+## maximum / minimum
+-- El mayor / menor elemento de una lista NO vacía.
+[E]
+maximum :: Ord a => [a] -> a
+maximum ;; [x] ;; = x
+maximum ;; (x:xs) ;; = max x (maximum xs)
+[S]
+maximum' :: Ord a => [a] -> a
+maximum' = foldr1 max
+[E]
+minimum :: Ord a => [a] -> a
+minimum ;; [x] ;; = x
+minimum ;; (x:xs) ;; = min x (minimum xs)
+[S]
+minimum' :: Ord a => [a] -> a
+minimum' = foldr1 min
+## last / init
+-- last: el último elemento. init: la lista sin el último. Miran si la cola es vacía, por eso recr. Parciales: error con la lista vacía.
+[E]
+last :: [a] -> a
+last ;; [x] ;; = x
+last ;; (_:xs) ;; = last xs
+[S]
+last' :: [a] -> a
+last' = recr (error "lista vacia")
+             (\x xs r -> if null xs then x else r)
+[E]
+init :: [a] -> [a]
+init ;; [x] ;; = []
+init ;; (x:xs) ;; = x : init xs
+[S]
+init' :: [a] -> [a]
+init' = recr (error "lista vacia")
+             (\x xs r -> if null xs then [] else x : r)
+## head / tail
+-- head: el primer elemento. tail: la lista sin el primero. PARCIALES: error con la lista vacía (no tienen cláusula para []).
+[E]
+head :: [a] -> a
+head ;; (x:_) ;; = x
+[S]
+head' :: [a] -> a
+head' = foldr (\x _ -> x) (error "lista vacia")
+[E]
+tail :: [a] -> [a]
+tail ;; (_:xs) ;; = xs
+[S]
+tail' :: [a] -> [a]
+tail' = recr (error "lista vacia") (\_ xs _ -> xs)
+## replicate / contarHasta (recursión sobre Int: quedan explícitas)
+-- replicate: lista con n copias de x. contarHasta: la lista [1, 2, ..., n]. (n >= 0)
+[C]
+replicate :: Int -> a -> [a]
+replicate ;; n ;; x ;; = if n == 0 then [] else x : replicate (n - 1) x
+[C]
+contarHasta :: Int -> [Int]
+contarHasta ;; n ;; = if n == 0 then [] else contarHasta (n - 1) ++ [n]
+
+# 4. FUNCIONES ÚTILES MAYBE |flow
+## combineM
+-- Combina 2 Just con f; si alguno es Nothing devuelve Nothing.
+[C]
+combineM :: (a -> b -> c) -> Maybe a -> Maybe b -> Maybe c
+combineM ;; f ;; (Just x) ;; (Just y) ;; = Just (f x y)
+combineM ;; _ ;; _ ;; _ ;; = Nothing
+-- combineM (+) (Just 1) (Just 2) = Just 3
+-- combineM (+) (Just 1) Nothing  = Nothing
+## combineM2
+-- Combina 2 Just con f; si falta uno devuelve el otro (todos los Maybe son del mismo tipo).
+[C]
+combineM2 :: (a -> a -> a) -> Maybe a -> Maybe a -> Maybe a
+combineM2 ;; f ;; (Just x) ;; (Just y) ;; = Just (f x y)
+combineM2 ;; f ;; Nothing ;; y ;; = y
+combineM2 ;; f ;; x ;; Nothing ;; = x
+-- combineM2 (+) (Just 1) Nothing  = Just 1
+-- combineM2 (+) Nothing Nothing   = Nothing
+## maybe
+-- Si es Nothing devuelve el valor por defecto; si es (Just x) devuelve (f x).
+[C]
+maybe :: b -> (a -> b) -> Maybe a -> b
+maybe ;; def ;; f ;; Nothing ;; = def
+maybe ;; def ;; f ;; (Just x) ;; = f x
+-- maybe 0 (+1) Nothing = 0
+-- maybe 0 (+1) (Just 2) = 3
+[M] -- caso de uso (maybe con case):
+[X]
+maybe 0 (+1) m
+  = case m of
+      Just x  -> x + 1
+      Nothing -> 0
+## encadenar (>>=)
+-- Encadena un paso que puede fallar: si ya falló sigue fallado; si hay valor se lo pasa a f. Se puede definir con maybe (encadenar').
+[E]
+encadenar :: Maybe a -> (a -> Maybe b) -> Maybe b
+encadenar ;; Nothing ;; _ ;; = Nothing
+encadenar ;; (Just x) ;; f ;; = f x
+[S]
+encadenar' :: Maybe a -> (a -> Maybe b) -> Maybe b
+encadenar' m f = maybe Nothing f m
+## orElse (<|>)
+-- El primer Just de los dos (sirve para buscar en dos ramas).
+[C]
+orElse :: Maybe a -> Maybe a -> Maybe a
+orElse ;; (Just x) ;; _ ;; = Just x
+orElse ;; Nothing ;; m ;; = m
+-- orElse (Just 1) (Just 2) = Just 1
+-- orElse Nothing (Just 2)  = Just 2
+## fmap (sobre Maybe) / fmapMaybe'
+-- Aplica f adentro del Just (Nothing queda Nothing). fmapMaybe' es la versión con maybe.
+[E]
+fmap :: (a -> b) -> Maybe a -> Maybe b
+fmap ;; f ;; Nothing ;; = Nothing
+fmap ;; f ;; (Just x) ;; = Just (f x)
+-- fmap (+1) (Just 2)   = Just 3
+-- fmap (1:) (Just [2]) = Just [1,2]
+-- fmap (1:) Nothing    = Nothing
+[S]
+fmapMaybe' :: (a -> b) -> Maybe a -> Maybe b
+fmapMaybe' f = maybe Nothing (Just . f)
+## fromMaybe
+-- Saca el valor del Just; si es Nothing devuelve d.
+[C]
+fromMaybe :: a -> Maybe a -> a
+fromMaybe ;; d ;; Nothing ;; = d
+fromMaybe ;; d ;; (Just x) ;; = x
+-- fromMaybe 0 Nothing  = 0
+-- fromMaybe 0 (Just 3) = 3
+## isJust / isNothing
+-- Indica si es un Just / si es Nothing.
+[C]
+isJust :: Maybe a -> Bool
+isJust ;; (Just _) ;; = True
+isJust ;; Nothing ;; = False
+-- isJust (Just 1) = True
+-- isJust Nothing  = False
+[C]
+isNothing :: Maybe a -> Bool
+isNothing ;; Nothing ;; = True
+isNothing ;; (Just _) ;; = False
+-- isNothing Nothing  = True
+-- isNothing (Just 1) = False
+## siCumple
+-- Just x si x cumple p, Nothing si no (el "filtro" de un valor).
+[C]
+siCumple :: (a -> Bool) -> a -> Maybe a
+siCumple p x = if p x then Just x else Nothing
+-- siCumple even 4 = Just 4
+-- siCumple even 3 = Nothing
+## catMaybes
+-- Se queda con los valores de los Just y descarta los Nothing.
+[E]
+catMaybes :: [Maybe a] -> [a]
+catMaybes ;; [] ;; = []
+catMaybes ;; (Nothing : ms) ;; = catMaybes ms
+catMaybes ;; (Just x : ms) ;; = x : catMaybes ms
+-- catMaybes [Just 1, Nothing, Just 3] = [1,3]
+[S]
+catMaybes' :: [Maybe a] -> [a]
+catMaybes' = foldr (\m r -> maybe r (: r) m) []
+## mapMaybe
+-- map + descartar los fallos: aplica f y se queda con los Just.
+[E]
+mapMaybe :: (a -> Maybe b) -> [a] -> [b]
+mapMaybe ;; f ;; [] ;; = []
+mapMaybe ;; f ;; (x:xs) ;; = case f x of
+@@     Nothing -> mapMaybe f xs
+@@     Just y  -> y : mapMaybe f xs
+-- mapMaybe (siCumple even) [1,2,3,4] = [2,4]
+[S]
+mapMaybe' :: (a -> Maybe b) -> [a] -> [b]
+mapMaybe' f = foldr (\x r -> maybe r (: r) (f x)) []
+## listToMaybe
+-- El primer elemento de la lista, si hay (Nothing con la lista vacía).
+[C]
+listToMaybe :: [a] -> Maybe a
+listToMaybe ;; [] ;; = Nothing
+listToMaybe ;; (x:_) ;; = Just x
+-- listToMaybe [1,2,3] = Just 1
+-- listToMaybe []      = Nothing
+## maybeToList
+-- Lista de 0 o 1 elementos.
+[C]
+maybeToList :: Maybe a -> [a]
+maybeToList ;; Nothing ;; = []
+maybeToList ;; (Just x) ;; = [x]
+-- maybeToList (Just 1) = [1]
+-- maybeToList Nothing  = []
+
+# 5. FUNCIONES ÚTILES BOOL |flow
+## bool
+-- Es como un if hecho función: si es False devuelve f, si es True devuelve t. Ojo: primero va el caso False y después el True (al revés que el if).
+[C]
+bool :: a -> a -> Bool -> a
+bool ;; f ;; t ;; False ;; = f
+bool ;; f ;; t ;; True ;; = t
+[M] -- caso de uso:
+[X]
+bool "impar" "par" (even n)
+  = if even n then "par" else "impar"
+## unoSi (= delta de la cátedra: `delta :: Bool -> Int`)
+-- 1 si es True, 0 si es False (para contar los que cumplen algo).
+[C]
+unoSi :: Bool -> Int
+unoSi ;; True ;; = 1
+unoSi ;; False ;; = 0
+-- unoSi True = 1
+-- unoSi False = 0
+
+# 6. FUNCIONES ÚTILES EITHER |flow
+## either
+-- `data Either a b = Left a | Right b` (Left suele ser el error, Right el resultado correcto). either aplica f si es (Left x) y g si es (Right y); f y g devuelven el mismo tipo c.
+[C]
+either :: (a -> c) -> (b -> c) -> Either a b -> c
+either ;; f ;; _ ;; (Left x) ;; = f x
+either ;; _ ;; g ;; (Right y) ;; = g y
+[M] -- caso de uso (e :: Either String Int):
+[X]
+either length (*2) e
+  = case e of
+      Left s  -> length s
+      Right n -> n * 2
+## Left / Right
+-- Los dos constructores de Either.
+[X]
+Left  :: a -> Either a b
+Right :: b -> Either a b
+-- Left "error" :: Either String Int
+-- Right 5      :: Either String Int
+
+# 7. FUNCIONES ÚTILES DE TUPLAS |flow
+## fst / snd
+-- La primera / segunda componente del par.
+[C]
+fst :: (a, b) -> a
+fst (x, _) = x
+[C]
+snd :: (a, b) -> b
+snd (_, y) = y
+## swap
+-- Da vuelta el par.
+[C]
+swap :: (a, b) -> (b, a)
+swap (x, y) = (y, x)
+## dup
+-- Duplica el valor en un par.
+[C]
+dup :: a -> (a, a)
+dup x = (x, x)
+## addFst / addSnd
+-- Transforman solo una componente del par (la primera / la segunda).
+[C]
+addFst :: (a -> c) -> (a, b) -> (c, b)
+addFst ;; f ;; (x, y) ;; = (f x, y)
+[C]
+addSnd :: (b -> c) -> (a, b) -> (a, c)
+addSnd ;; f ;; (x, y) ;; = (x, f y)
+## cross
+-- Transforma cada componente del par con su propia función.
+[C]
+cross :: (a -> c) -> (b -> d) -> (a, b) -> (c, d)
+cross ;; f ;; g ;; (x, y) ;; = (f x, g y)
+## split
+-- Aplica dos funciones al mismo valor (ej. `dimensiones = split alto ancho`).
+[C]
+split :: (a -> b) -> (a -> c) -> a -> (b, c)
+split ;; f ;; g ;; x ;; = (f x, g x)
+
+# 8. SECCIONES, (.), ($) Y compare |flow
+## Secciones de operadores
+-- Un operador con un argumento fijo es una función. `(-1)` NO es sección: es el número -1 (usar subtract).
+[X]
+(+1) ;; -- \x -> x + 1
+(1+) ;; -- \x -> 1 + x
+(2>) ;; -- \x -> 2 > x
+(>2) ;; -- \x -> x > 2
+(x:) ;; -- \xs -> x : xs   (agrega x adelante)
+(++ ys) ;; -- \xs -> xs ++ ys
+(`div` 2) ;; -- \x -> div x 2
+(subtract 1) ;; -- \x -> x - 1
+## (.) y ($)
+-- (.) compone funciones. ($) aplica sin paréntesis (asocia a la derecha).
+[X]
+(f . g) x ;; = f (g x)
+f $ x ;; = f x
+-- f $ g $ h x = f (g (h x))
+-- map (f . g) xs = map f (map g xs)
+## compare
+-- Compara dos valores: LT, EQ o GT. Uso típico: el `case compare x y of` al fusionar dos secuencias ordenadas.
+[C]
+compare :: Ord a => a -> a -> Ordering
+compare x y = if x < y then LT else if x == y then EQ else GT
+-- compare 1 2 = LT ; compare 2 2 = EQ ; compare 3 2 = GT
+[M] -- caso de uso:
+[X]
+case compare x y of
+  LT -> ...    -- x < y
+  EQ -> ...    -- x == y
+  GT -> ...    -- x > y
+
+# 9. FUNCIONES SOBRE ÁRBOLES
+## data Tree, foldT y recT
+-- Tipo de ejemplo (el de la guía y el cheat-sheet). foldT: un parámetro por constructor; los campos recursivos se reemplazan por el resultado b. recT: además recibe los subárboles ORIGINALES.
+[C]
+data Tree a = EmptyT | NodeT a (Tree a) (Tree a)
+[C]
+foldT :: b -> (a -> b -> b -> b) -> Tree a -> b
+foldT ;; z ;; f ;; EmptyT ;; = z
+foldT ;; z ;; f ;; (NodeT x l r) ;; = f x (foldT z f l) (foldT z f r)
+[C]
+recT :: b -> (a -> Tree a -> Tree a -> b -> b -> b) -> Tree a -> b
+recT ;; z ;; f ;; EmptyT ;; = z
+recT ;; z ;; f ;; (NodeT x l r) ;; = f x l r (recT z f l) (recT z f r)
+## sumT
+-- Suma los elementos.
+[E]
+sumT :: Tree Int -> Int
+sumT ;; EmptyT ;; = 0
+sumT ;; (NodeT x l r) ;; = x + sumT l + sumT r
+[S]
+sumT' :: Tree Int -> Int
+sumT' = foldT 0 (\x l r -> x + l + r)
+## sizeT
+-- Cantidad de elementos.
+[E]
+sizeT :: Tree a -> Int
+sizeT ;; EmptyT ;; = 0
+sizeT ;; (NodeT _ l r) ;; = 1 + sizeT l + sizeT r
+[S]
+sizeT' :: Tree a -> Int
+sizeT' = foldT 0 (\_ l r -> 1 + l + r)
+## heightT
+-- Altura (el árbol vacío tiene altura 0).
+[E]
+heightT :: Tree a -> Int
+heightT ;; EmptyT ;; = 0
+heightT ;; (NodeT _ l r) ;; = 1 + max (heightT l) (heightT r)
+[S]
+heightT' :: Tree a -> Int
+heightT' = foldT 0 (\_ l r -> 1 + max l r)
+## inOrder
+-- Elementos en orden izquierda - raíz - derecha.
+[E]
+inOrder :: Tree a -> [a]
+inOrder ;; EmptyT ;; = []
+inOrder ;; (NodeT x l r) ;; = inOrder l ++ [x] ++ inOrder r
+[S]
+inOrder' :: Tree a -> [a]
+inOrder' = foldT [] (\x l r -> l ++ [x] ++ r)
+## mapT
+-- Transforma cada elemento con f.
+[E]
+mapT :: (a -> b) -> Tree a -> Tree b
+mapT ;; f ;; EmptyT ;; = EmptyT
+mapT ;; f ;; (NodeT x l r) ;; = NodeT (f x) (mapT f l) (mapT f r)
+[S]
+mapT' :: (a -> b) -> Tree a -> Tree b
+mapT' f = foldT EmptyT (\x l r -> NodeT (f x) l r)
+## mirrorT
+-- Espeja el árbol (intercambia izquierda y derecha en todos los niveles).
+[E]
+mirrorT :: Tree a -> Tree a
+mirrorT ;; EmptyT ;; = EmptyT
+mirrorT ;; (NodeT x l r) ;; = NodeT x (mirrorT r) (mirrorT l)
+[S]
+mirrorT' :: Tree a -> Tree a
+mirrorT' = foldT EmptyT (\x l r -> NodeT x r l)
+## elemT
+-- Indica si x está en el árbol. Con esquema, x es FIJO: queda afuera del fold.
+[E]
+elemT :: Eq a => a -> Tree a -> Bool
+elemT ;; x ;; EmptyT ;; = False
+elemT ;; x ;; (NodeT y l r) ;; = x == y || elemT x l || elemT x r
+[S]
+elemT' :: Eq a => a -> Tree a -> Bool
+elemT' x = foldT False (\y l r -> x == y || l || r)
+## countT
+-- Cuántos elementos del árbol cumplen p (como countBy, pero sobre árboles).
+[E]
+countT :: (a -> Bool) -> Tree a -> Int
+countT ;; p ;; EmptyT ;; = 0
+countT ;; p ;; (NodeT x l r) ;; = unoSi (p x) + countT p l + countT p r
+[S]
+countT' :: (a -> Bool) -> Tree a -> Int
+countT' p = foldT 0 (\x l r -> unoSi (p x) + l + r)
+## anyT
+-- Indica si ALGÚN elemento del árbol cumple p.
+[E]
+anyT :: (a -> Bool) -> Tree a -> Bool
+anyT ;; p ;; EmptyT ;; = False
+anyT ;; p ;; (NodeT x l r) ;; = p x || anyT p l || anyT p r
+[S]
+anyT' :: (a -> Bool) -> Tree a -> Bool
+anyT' p = foldT False (\x l r -> p x || l || r)
