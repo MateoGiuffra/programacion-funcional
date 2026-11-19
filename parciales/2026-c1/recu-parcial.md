@@ -6,8 +6,7 @@ Libro abierto. Se pueden usar funciones y propiedades vistas en clase citando su
 
 ## Base para copiar
 
-Un acueducto se arma a partir de vertientes (manantiales), filtros, confluencias y divergencias. Como `Filtro` guarda una función, `Acueducto` no puede derivar `Show` ni `Eq`: se da una instancia `Show` manual (la función se muestra como `<fun>`). Para comparar acueductos en las pruebas usar `show`. Copiar este bloque primero; compila tal cual.
-
+Un acueducto se arma a partir de vertientes (manantiales), filtros, confluencias y divergencias.
 ```haskell
 type Caudal = Int   -- no hace falta preocuparse por los negativos
 

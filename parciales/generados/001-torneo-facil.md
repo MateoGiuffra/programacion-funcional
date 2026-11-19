@@ -4,8 +4,7 @@ Libro abierto. Se pueden usar funciones y propiedades vistas en clase (`length`,
 
 ## Base para copiar
 
-Un torneo de eliminación se representa con el siguiente tipo, más dos ejemplos que se reutilizan en todo el enunciado. Copiar este bloque primero; compila tal cual.
-
+Un torneo de eliminación se representa con el siguiente tipo, más dos ejemplos que se reutilizan en todo el enunciado.
 ```haskell
 type Nombre = String
 

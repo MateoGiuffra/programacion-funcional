@@ -4,8 +4,7 @@ Libro abierto. Se pueden usar funciones y propiedades vistas en clase citando su
 
 ## Base para copiar
 
-Una cuenta es una expresión que describe cómo se arma un total. Copiar este bloque primero; compila tal cual.
-
+Una cuenta es una expresión que describe cómo se arma un total.
 ```haskell
 data Cuenta = Nada                  -- cuenta vacía
             | Item Int              -- un ítem con su precio

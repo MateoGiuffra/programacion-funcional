@@ -42,3 +42,12 @@ nucleoRamificado :: Acueducto -> Acueducto
 3. hace foldAc y recAc
 4. rehace las funciones recursivas del ej1 con foldAc o recAc
 -}
+
+
+buscarNombre :: Maybe Usuario -> String
+buscarNombre m = case m of 
+                    Just m' -> nombre m'
+                    Nothing -> "desconocido"
+
+buscarNombre :: Maybe Usuario -> String
+buscarNombre m = maybe "desconocido" nombre m

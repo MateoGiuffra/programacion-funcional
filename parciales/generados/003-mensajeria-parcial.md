@@ -4,8 +4,7 @@ Libro abierto. Se pueden usar funciones y propiedades vistas en clase citando su
 
 ## Base para copiar
 
-Un hilo de mensajería se describe así. Como `Edicion` guarda una función, `Mensaje` no puede derivar `Show` ni `Eq`: se da una instancia `Show` manual (la función se muestra como `<fun>`). Para comparar mensajes en las pruebas se usa `show` o `leer`. Copiar este bloque primero; compila tal cual.
-
+Un hilo de mensajería se describe así.
 ```haskell
 type Contacto = String
 
