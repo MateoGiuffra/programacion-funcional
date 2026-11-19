@@ -7,7 +7,7 @@ description: Destrabar demostraciones de Programación Funcional (UNQ, Haskell) 
 
 Complementa a `profe` (tono corto, simple, proactivo). Acá va lo específico de PF.
 Antes de ayudar, respetar las memorias: `convenciones_demostraciones_pf` (notación HI/TI, LI/LD, `¡ ! ¿ ?`, lemas nombrados, `VALE ESTE CASO`) y `feedback_sin_arboles_generales_pf` (nada de `[T]` recursivo al inventar tipos).
-Detalle en [patrones.md](patrones.md): errores reales del usuario, cheatsheet, plantilla.
+Detalle en [patrones.md](patrones.md): errores reales del usuario, cheatsheet, plantilla, **3b estilo real del profe (ejemplo LI/LD, lemas)** y **3c checklist de corrección de demos** (usarla al revisar resoluciones del usuario).
 Referencias del repo: `global/ayudas/demos.md` (frases exactas), `global/demos-template.hs`, `parciales/resolucion/mia/*.hs` (sus demos).
 
 ## Estilo de interacción (OBLIGATORIO)
@@ -35,6 +35,7 @@ Siempre cerrar con la próxima acción chica ("probá el caso base y pegámelo")
 - **Cuándo def y cuándo lema**: def mientras el argumento tenga forma de constructor. Lema cuando necesitás una propiedad de una función auxiliar sobre una expresión SIN constructor visible (ej. `evalMSE (simpUnion a b)`). Enunciar el lema con `¿ ? `, nombrarlo (`LEMA-X`), probarlo aparte. Si la función del lema no es recursiva, el lema es análisis de casos, no inducción.
 - **Cuándo generalizar**: si la HI queda "chica" (fija un parámetro y en el paso inductivo hace falta con otro: acumuladores, `flip`, `foldr` con `f` modificada), generalizar: probar para TODO valor del parámetro (`para todo k`). Señal: el paso inductivo llama a la función recursiva con un parámetro distinto al de la HI.
 - **Si hay `if`**: análisis de casos sobre la condición (`cond = True`/`False`), no "evaluar" el if. Atajo solo para ifs anidados con mismo `else`.
+- **Feedback del docente sobre lemas/formato**: (1) primero PLANTEÁ los casos ("quiero ver que: C1) ... C2) ... C3) ...") y después desarrollalos; (2) un lema sale por inducción estructural o por casos exhaustivos, NO por extensionalidad (enunciá el lema con argumentos, no como igualdad de funciones); con dos parámetros, a veces fijás uno e inducís sobre el otro; (3) **dejá visible la subexpresión** sobre la que aplicás cada equivalencia: copiá la expresión completa en cada paso y, si querés, subrayala con `^^^`/`[ ]` (pedido del docente a la cursada; el PDF resuelto del profe MultiSets 2021s2 NO subraya, solo copia la expresión entera con `=  (por f.N)` entre pasos); (4) casos exhaustivos Y disjuntos: chequeá que no quede combinación sin cubrir (ej. `responder Eliminado Eliminado`).
 - **Si hay `case`/pattern matching en el lema**: análisis de casos por forma (`x != Firewall` / `x = Firewall`); los casos deben ser exhaustivos (complemento con "o", no "y").
 - **Un caso inductivo cierra sin usar la HI**: sospechar. O falta un caso, o la HI estaba mal planteada.
 - **No vale**: probar con un contraejemplo chico (`[]`, `[x]`, `[x,y]`) evaluando a mano; si da distinto, la propiedad es falsa y se demuestra con un contraejemplo (ej. `unzip (zip xs ys) = (xs, ys)` falla con listas de distinto largo).

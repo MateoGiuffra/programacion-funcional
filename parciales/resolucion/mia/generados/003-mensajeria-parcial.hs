@@ -288,7 +288,15 @@ vale.
 LEMA-res
 Siendo m1, m2 :: Mensaje
 ¿ para todo m1, m2. leer (responder m1 m2) = leer m1 ++ leer m2 ? 
-Por analisis de casos sobre m1 y m2:
+por analisis de casos sobre m1 y m2, quiero ver que:
+C1)
+    m1 = Eliminado, m2 != Eliminado
+C2)
+    m2 = Eliminado, m1 != Eliminado
+C3)
+    m1 != Eliminado, m2 != Eliminado
+
+ 
 C1)
 m1 = Eliminado, m2 != Eliminado
 LI)

@@ -159,6 +159,71 @@ Variantes:
 - Análisis de casos: `por análisis de casos sobre <var>`; `c1) <var> = ...`, `c2) <var> != ...` (complemento con "o"); si la función es un `if`, casos `cond = True` / `cond = False`.
 - Cuando la prop. es puntual (`length (xs ++ ys) = ...`) se saltea extensionalidad y compose: fijar `ys` y inducir sobre `xs`.
 
+## 3b. Estilo REAL del profe (PDF resuelto, MultiSets 2021s2: `evalMSE . simpMSE = evalMSE`)
+
+Modelo corto para imitar/comparar (copiado de su resolución; la plantilla de la sección 3 es la notación del usuario, esto es lo que el docente muestra):
+
+```
+PROP: ¿ evalMSE . simpMSE = evalMSE ?
+DEM: Por principio de extensionalidad, veremos que
+       ¿ para todo e :: MSExp. (evalMSE . simpMSE) e = evalMSE e ?
+     Por la definición de (.), es equivalente ver que
+       ¿ para todo e :: MSExp. evalMSE (simpMSE e) = evalMSE e ?
+     Sea e una MSExp. Por principio de inducción en la estructura de e.
+
+Caso base: e=EmptyMS)
+     TI) ¿ evalMSE (simpMSE e) = evalMSE e ?
+Caso ind. 2: e=RemoveMS x e1)
+     HI1) ¡ evalMSE (simpMSE e1) = evalMSE e1 !
+     TI) ¿ evalMSE (simpMSE (RemoveMS x e1)) = evalMSE (RemoveMS x e1) ?
+Caso ind. 3: e=UnionMS e1 e2)      -- HI1) y HI2) una por posición recursiva
+   ...
+(luego se desarrolla cada caso:)
+Caso ind. 2)
+     evalMSE (simpMSE (RemoveMS x e1))
+=                  (por simpMSE.3)
+     evalMSE (simpRemoveMS x (simpMSE e1))
+=                  (por Lema evalMSE-simpRemoveMS)
+     quitar x (evalMSE (simpMSE e1))
+=                  (por HI)
+     quitar x (evalMSE e1)
+=                  (por evalMSE.3)
+     evalMSE (RemoveMS x e1)
+
+LEMA evalMSE-simpRemoveMS)
+     ¿ evalMSE (simpRemoveMS x e) = quitar x (evalMSE e) ?
+LEMA evalMSE-simpMapMS)
+     ¿ evalMSE (simpMapMS f e) = map f (evalMSE e) ?
+Dem: sean f y e, cualesquiera.
+Caso 1: e = EmptyMS)       ¿ evalMSE (simpMapMS f EmptyMS) = map f (evalMSE EmptyMS) ?
+Caso 2: e distinto de EmptyMS)   ¿ evalMSE (simpMapMS f e) = map f (evalMSE e) ?
+```
+
+Rasgos observados (el profe NO hace todo como el usuario):
+- **Una sola cadena**, no LI/LD en paralelo: parte del lado izquierdo y termina en EXACTAMENTE el lado derecho del enunciado del caso (la última ecuación se usa "al revés", p. ej. `evalMSE.3` reconstruye `evalMSE (RemoveMS x e1)`). El usuario puede usar LI/LD paralelos (válido si ambos llegan a la misma expresión); lo que se exige es que no haya salto.
+- **Formato del paso**: expresión / línea con `=` y `(por X)` / expresión. La justificación va en la línea del `=`, entre expresiones, no al costado. Etiquetas: `simpMSE.3`, `evalMSE.2`, `HI`, `HI1 y HI2`, `Lema <f>-<g>`. Un paso = una ecuación; ni `def (.)` ni aritmética ni "def HI". `(.)` se despliega UNA vez en el encabezado (extensionalidad), no como paso.
+- **Sin subrayado**: en el PDF no hay `^^^` ni `[ ]`; la subexpresión se ve por la expresión completa copiada en cada paso. Subrayar es un extra pedagógico del usuario, no un requisito visible del profe.
+- **Cada paso reescribe una sola subexpresión** y la expresión se copia completa y bien parentizada (ej. `evalMSE (simpUnionMS (simpMSE e1) (simpMSE e2))`).
+- **Planteo primero**: todos los casos con su HI/TI (marcados `¡ ... !` / `¿ ... ?`; la HI se escribe como lo que se TIENE, la TI como lo que se quiere) antes de desarrollar ninguno. Nombres: `Caso base: e=EmptyMS)`, `Caso ind. 1: e=AddMS x e1)`; HI por posición recursiva (`HI1`, `HI2`), una sola se llama `HI` en los pasos. El `e` universal se introduce con "Sea e una MSExp." y los parámetros fijos (x, f) quedan genéricos.
+- **Lemas por función auxiliar**: el parcial define un auxiliar por regla (`simpRemoveMS`, `simpUnionMS`, `simpMapMS`) y un lema por auxiliar, con forma `g (aux args) = <lado derecho de la ecuación de g para el constructor>` (ej. `evalMSE (simpUnionMS e1 e2) = evalMSE e1 ++ evalMSE e2`), de modo que luego de aplicarlo se pueda usar HI directo. Nombre `<f>-<aux>` y enunciado con `¿ ... ?`, con argumentos explícitos (no igualdad de funciones).
+- **Lema = análisis de casos sobre la forma del argumento**, planteado antes de desarrollar: `Dem: sean f y e, cualesquiera.` / `Caso 1: e = EmptyMS)` / `Caso 2: e distinto de EmptyMS)` (disjuntos y exhaustivos, "distinto de" para el complemento de las ecuaciones solapadas). Si el auxiliar no es recursivo no hay inducción. En el PDF solo se dejan planteados, no desarrollados (es una "solución posible").
+- **Funciones**: ecuaciones numeradas en orden por ejercicio y citadas `f.N`; un auxiliar por regla de simplificación (patrón "smart constructor"); auxiliares con parámetro extra para lo no estructural (`occursMSEWith x g` acumula `g . f` en `MapMS`); `delta :: Bool -> Int`; `let` para reusar el resultado recursivo. El enunciado de la demo es solo la propiedad: NO da lemas, hay que descubrirlos.
+- Ojo: la "solución posible" tiene typos (`occursMESWith`, `filter` por `filterMSE`, `quitar`/`quitarSiHay`, `EmptyMSE`, `isValidMSE x`), y la reescritura con `fold`/`rec` (ej. 3 y 4) quedó vacía: sirve como estilo, no como fuente de código correcto.
+
+## 3c. Checklist de corrección de demos (lo que el profe exige; usar al revisar las del usuario)
+
+Revisar en este orden y señalar UN ítem fallado a la vez (pistas graduales):
+1. [ ] **Enunciado** con `¿ ... ?`; si hay `(.)`/igualdad de funciones: extensionalidad ("para todo x ...") y desplegar `(.)` una vez. Compose bien parseado (E1).
+2. [ ] **Variable de inducción** correcta; el tipo recursivo; parámetros fijos genéricos; casos base sin fijar otras variables.
+3. [ ] **Casos planteados antes** de desarrollar: uno por constructor, ni uno más ni menos; HI por cada posición recursiva (sobre las subestructuras, no sobre el nodo; E2); TI con la variable sustituida en AMBOS lados.
+4. [ ] **Notación**: HI `¡ ! `, TI `¿ ?`, lemas `¿ ?`; nombres de variables iguales al planteo (E3).
+5. [ ] **Cada paso**: una sola ecuación, justificada y numerada (`f.N`, `HI`, `LEMA-X`); la ecuación aplica al lado izquierdo EXACTO de la subexpresión (argumento con forma de constructor); sin pasos mudos (asociatividad/aritmética escritos, E6); nada de "def HI" (E7).
+6. [ ] **HI/lema solo sobre la subexpresión**, sin envolver de más ni dejar funciones sobrantes (E4); la HI aparece literal.
+7. [ ] **Lemas**: enunciados con argumentos (no extensionalidad), por inducción o por casos exhaustivos y disjuntos (planteados primero); un lema por cada igualdad intermedia con función sin constructor visible; ningún lema falso; no usar propiedades no vistas (conmutatividad de `++`, etc.) sin enunciarlas/citarlas.
+8. [ ] **Si hay `if`/`case`/guardas**: análisis de casos sobre la condición, no "evaluar".
+9. [ ] **Cierre**: cada caso termina exactamente en la expresión objetivo (o LI y LD convergen), cada caso cerrado con `VALE ESTE CASO`, demo con `La propiedad vale.`; ningún caso vacío/inconcluso (E5). Un caso inductivo que no usa HI: sospechar.
+10. [ ] **Criterio de nota**: estructura correcta (extensionalidad, casos, HI/TI) vale aunque falle un paso; un paso con propiedad inventada o HI mal planteada pesa más que un typo de variable.
+
 ## 4. Diagnóstico de nivel (según el repo)
 
 - **Implementación: nivel alto/medio-alto.** Recursión explícita, esquemas fold/rec y reescritura con fold están hechos en ~10 parciales (Incidente, Animaciones, MultiSet, ThreeT, Nim, Torneo, Calabozos, Tipado simple). Algunos errores de detalle (patrones no exhaustivos, `isJust _ = False`, tipos de acumuladores en fold) pero el razonamiento es correcto.

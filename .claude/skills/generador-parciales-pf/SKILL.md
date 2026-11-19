@@ -61,12 +61,19 @@ Ningún parcial viejo declara puntaje; se usa una rúbrica propia por 100 pts y 
 ## 6. Formato de demostración (obligatorio, convenciones del usuario)
 
 - Enunciar la propiedad con `¿ ... ?`; si hay `(.)` o igualdad de funciones: **principio de extensionalidad** ("sea x un ... cualquiera") y desplegar `(.)`.
+- Planteo como el profe (`PROP:` / `DEM:` / "Por principio de extensionalidad, veremos que ¿ para todo e. (f . g) e = h e ?" / "Por la definición de (.), es equivalente ver que ..." / "Sea e una T. Por principio de inducción en la estructura de e.") y casos nombrados `Caso base: e=Vacio)`, `Caso ind. 1: e=Nodo x e1)`, TODOS planteados (HI/TI) antes de desarrollar cualquiera.
 - Casos de **inducción estructural**: `casoBase)`, `casoInductivo1)`, ... uno por constructor, cada uno con **HI** (`¡ ... !`, HI1/HI2 si hay varias posiciones recursivas) y **TI** (`¿ ... ?`).
 - Sección `DEMO:` aparte: cada caso con **LI** y **LD** como cadenas de `=`, justificando cada paso a la derecha (`-- foo.2`, `-- HI`, `-- LEMA-NOMBRE`, `-- def (.)`, `-- map.2`).
+- Lemas como en el profe: un auxiliar por regla en el ADT (patrón `simpUnionMS`, `simpMapMS`) y un lema por auxiliar, `LEMA <f>-<aux>)` con enunciado `g (aux args) = <lado der. de la ecuación de g>` (así tras el lema entra la HI), probado por casos sobre la forma del argumento (`Caso 1: e = Vacio)`, `Caso 2: e distinto de Vacio)`) con `Dem: sean f y e, cualesquiera.`. El enunciado del parcial da solo la propiedad: los lemas los descubre el alumno.
 - Igualdades intermedias no triviales: **lema con nombre** (`LEMA-NOMBRE`), enunciado con `¿...?` y probado aparte con su LI/LD.
 - Cada caso cerrado termina con `VALE ESTE CASO`.
 - Numerar las ecuaciones de cada función (`f.1`, `f.2`) en el enunciado de soluciones para poder citarlas.
 - En el enunciado se puede dar: caso(s) a NO desarrollar, y/o un lema ya enunciado para usar sin probar.
+- Feedback del docente (aplicar en TODAS las soluciones/rúbricas):
+  - **Lemas**: primero se PLANTEAN los casos ("quiero ver que: C1) ... C2) ... C3) ...") y recién después se desarrollan, igual que en una demo. Los casos de un análisis por casos deben ser **exhaustivos y disjuntos** (si las ecuaciones se pisan, como `responder.1/.2/.3`, definir los casos con las exclusiones que hagan falta y chequear que no quede ninguna combinación sin cubrir, ej. ambos `Eliminado`).
+  - Un lema sale por **inducción estructural** o por **casos exhaustivos**. NO por extensionalidad: el lema se propone de forma que no haga falta (enunciarlo con argumentos, no como igualdad de funciones). Si el lema tiene dos parámetros, a veces se deja uno fijo y se hace inducción sobre el otro; puede haber demos por inducción con un lema por inducción adentro.
+  - **Dejar visible la subexpresión** reescrita en cada paso (expresión completa copiada; `^^^` opcional en pasos poco obvios; ver 6d: el profe en su PDF no subraya).
+  - Nunca justificar con propiedades falsas (ej. "conmutatividad del `++`"): usar el lema dado (`APP-NIL`, etc.).
 
 ## 6b. Patrones recurrentes de enunciado
 
@@ -77,6 +84,31 @@ Ningún parcial viejo declara puntaje; se usa una rúbrica propia por 100 pts y 
 - Ejercicio final de esquemas: "Dar los tipos y escribir los esquemas de recursión estructural y primitiva para <Tipo>".
 - Reescritura: "sin recursión explícita en ninguna función diferente de los esquemas".
 - Funciones sobre listas de ADTs (`largest :: [Spaceship] -> Spaceship`, `test`, `combinar`) para mezclar foldr con el fold propio.
+
+## 6d. Cómo se ve un paso y el subrayado en las soluciones (refinado con el PDF resuelto del profe, MultiSets 2021s2)
+
+El profe NO subraya: copia la expresión COMPLETA en cada paso (bien parentizada, una sola subexpresión reescrita por paso) y pone el `=` con la justificación en la línea intermedia:
+
+```
+    evalMSE (simpMSE (RemoveMS x e1))
+=                    (por simpMSE.3)
+    evalMSE (simpRemoveMS x (simpMSE e1))
+=                    (por Lema evalMSE-simpRemoveMS)
+    quitar x (evalMSE (simpMSE e1))
+=                    (por HI)
+    quitar x (evalMSE e1)
+=                    (por evalMSE.3)
+    evalMSE (RemoveMS x e1)
+```
+
+En las soluciones generadas: usar este formato (un paso = una ecuación `f.N` / `HI` / `HI1 y HI2` / `Lema f-aux`; cadena que parte del LI y termina EXACTAMENTE en el LD del TI, la última ecuación puede usarse al revés; `(.)` se despliega una vez en el encabezado, no como paso). El subrayado `^^^` pedido por el docente a la cursada se mantiene como ayuda SOLO en pasos donde la subexpresión no es obvia (expresión larga/anidada), con `^` debajo del lado izquierdo de la ecuación citada (variables instanciadas); no hace falta en todos los pasos.
+
+```
+    leer (responder m1 Eliminado)
+           ^^^^^^^^^^^^^^^^^^^^^^
+=                                   responder.2
+    leer m1
+```
 
 ## 6c. Formato "copiar y listo" del enunciado (obligatorio)
 

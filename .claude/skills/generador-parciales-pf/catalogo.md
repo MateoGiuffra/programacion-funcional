@@ -21,6 +21,11 @@ Observaciones de estilo: los ADTs reales mezclan datos con funciones, parámetro
 
 Sistemas de riego, subte/transporte, cadenas de suministro, colonia espacial, permisos/ACL, autómata de videojuego, protocolo de red, árbol genealógico, circuito eléctrico, delivery, cadena alimenticia, facturación con descuentos encadenados, receta/cocina con pasos, compilador de planillas (celdas con fórmulas), editor de texto con undo/redo (comandos), playlist con efectos, cinta de montaje en fábrica, torneo de eliminatorias, cultivos y estaciones, biblioteca con préstamos, mazo de cartas con reglas, mensajería con reenvíos, semáforos/ciudad, inventario de mochila RPG.
 
+## Estilo del profe visible en el PDF resuelto de MultiSet (2021s2)
+
+- Ej. 1 con aux de parámetro extra (`occursMSEWith x g`, `g . f` en `MapMS`), `delta :: Bool -> Int`, `let` para el resultado recursivo; reglas de simplificación como un aux por regla (`simpRemoveMS`, `simpUnionMS` con ecuaciones solapadas, `simpMapMS`) y un lema `evalMSE-<aux>` por aux. Enunciado: ej. 2 = solo la propiedad, ej. 3 = tipos de fold/rec, ej. 4 = reescritura. Para generar demos de nivel parcial: diseñar un `simp` con un aux por regla para que cada lema salga por casos.
+- Ver profe-pf/patrones.md 3b para el formato exacto de la demo.
+
 ## Mecánica para inventar un dominio nuevo (6 pasos)
 
 1. **Elegir forma** (aridad recursiva fija): hoja / unario / binario / ternario / DSL secuencia-paralelo / lenguaje de expresiones.
