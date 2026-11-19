@@ -166,3 +166,51 @@ if b1 then (if b2 then e1 else e2) else e2  =  if (b1 && b2) then e1 else e2
 ```
 
 - Si los `else` **no** son la misma expresión, el atajo no aplica: abrí los casos combinados de `b1` / `b2` uno por uno.
+
+**Dos formas de resolverla.** Ejemplo (`004-demo-if`), con la propiedad `cantidad (mayores y xs) + cantidad (noMayores y xs) = cantidad xs`, donde `mayores y (Cons x xs) = if x > y then Cons x (mayores y xs) else mayores y xs` (y `noMayores` con el `if` al revés). En el `casoInductivo`, después de `mayores.2` y `noMayores.2`, aparecen **dos `if` con la misma condición** `x > y`:
+
+**Forma A: casos adentro del `casoInductivo`** (la más directa; el `if` aparece una sola vez)
+
+```
+por analisis de casos sobre x > y
+
+c1) x > y = True
+c2) x > y = False
+
+c1)
+    cantidad (if x > y then Cons x (mayores y xs') else mayores y xs') + cantidad (if x > y then noMayores y xs' else Cons x (noMayores y xs'))
+=                       def. if, ya que x > y = True
+    cantidad (Cons x (mayores y xs')) + cantidad (noMayores y xs')
+=                       cantidad.2
+    (1 + cantidad (mayores y xs')) + cantidad (noMayores y xs')
+=                       aritm (asociatividad de +)
+    1 + (cantidad (mayores y xs') + cantidad (noMayores y xs'))
+=                       HI
+    1 + cantidad xs'
+c2)   (igual, con def. if ya que x > y = False; `cantidad.2` deja `a + (1 + b)` y
+       `aritm` usa conmutatividad y asociatividad para llegar a `1 + (a + b)`)
+```
+
+**Forma B: lema** (saca los casos de la cadena principal; vale si se reutiliza o querés una cadena corta)
+
+```
+En la cadena principal, tras noMayores.2:
+    cantidad (if x > y ...) + cantidad (if x > y ...)
+=                       LEMA-BOOL
+    1 + (cantidad (mayores y xs') + cantidad (noMayores y xs'))
+=                       HI
+    1 + cantidad xs'
+
+LEMA-BOOL)
+    ¿ para todo x, y, xs'.
+        cantidad (if x > y then Cons x (mayores y xs') else mayores y xs')
+      + cantidad (if x > y then noMayores y xs' else Cons x (noMayores y xs'))
+      = 1 + (cantidad (mayores y xs') + cantidad (noMayores y xs')) ?
+Sean x, y, xs' cualesquiera.
+por analisis de casos sobre x > y   (c1 y c2, igual que en la Forma A, y cada una
+termina en el lado derecho del lema)
+```
+
+- **Regla en ambas:** el lado derecho lleva paréntesis (`1 + (a + b)`) para que la HI quede **literal**.
+- **Un lema (afirmación general) no usa la HI de la demo padre.** La HI se usa en la cadena principal, no adentro del lema.
+- Ejemplo completo de la Forma B: `parciales/resolucion/mia/004-demo-if-con-lema.hs`.
